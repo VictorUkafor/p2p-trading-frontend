@@ -1,1 +1,1 @@
-# p2p-trading-frontend
+# P2P Trading Frontend
