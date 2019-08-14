@@ -1,24 +1,34 @@
 import Vue from 'vue';
 import Router from 'vue-router';
-import LandingPage from '@/components/LandingPage';
+import AppHeader from "../layout/AppHeader";
+import AppFooter from "../layout/AppFooter";
+import Landing from '../views/Landing';
 
 Vue.use(Router);
 
 export default new Router({
+  mode: 'history',
+  linkExactActiveClass: "active",
   routes: [
     {
       path: '/',
-      name: 'LandingPage',
-      component: LandingPage,
-      title: 'Get Started - P2P Trading',
-      metaTags: [
-        {
-          name: 'description',
-          content: 'Let\'s get you started',
-        },
-      ],
+      name: "landing",
+      components: {
+        header: AppHeader,
+        default: Landing,
+        footer: AppFooter
+      },
+      meta: {
+        title: 'P2P Trading - Get Started',
+      }
     },
-  ],
 
-  mode: 'history',
+  ],
+  scrollBehavior: to => {
+    if (to.hash) {
+      return { selector: to.hash };
+    } else {
+      return { x: 0, y: 0 };
+    }
+  },
 });

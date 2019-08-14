@@ -1,15 +1,20 @@
 import Vue from 'vue';
 import App from './App';
 import router from './router';
+import Argon from "./plugins/argon-kit";
 import store from './store';
 
 Vue.config.productionTip = false;
+Vue.use(Argon);
 
-/* eslint-disable no-new */
+router.afterEach((to, from) => {
+  Vue.nextTick( () => {
+    document.title = to.meta.title ? to.meta.title : 'P2P Trading';
+  });
+})
+
 new Vue({
-  el: '#app',
-  router,
+  router,  
   store,
-  components: { App },
-  template: '<App/>',
-});
+  render: h => h(App)
+}).$mount("#app");
