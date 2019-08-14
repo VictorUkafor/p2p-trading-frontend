@@ -10,6 +10,15 @@ export default new Router({
       path: '/',
       name: 'LandingPage',
       component: LandingPage,
+      title: 'Get Started - P2P Trading',
+      metaTags: [
+        {
+          name: 'description',
+          content: 'Let\'s get you started',
+        },
+      ],
     },
   ],
+
+  mode: 'history',
 });
