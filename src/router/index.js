@@ -3,6 +3,7 @@ import Router from 'vue-router';
 import AppHeader from "../layout/AppHeader";
 import AppFooter from "../layout/AppFooter";
 import Landing from '../views/Landing';
+import Register from '../views/Register';
 
 Vue.use(Router);
 
@@ -19,7 +20,19 @@ export default new Router({
         footer: AppFooter
       },
       meta: {
-        title: 'P2P Trading - Get Started',
+        title: 'Get Started - P2P Trading',
+      },
+    },
+      {
+        path: '/register',
+        name: "register",
+        components: {
+          header: AppHeader,
+          default: Register,
+          footer: AppFooter
+        },
+      meta: {
+        title: 'Register - P2P Trading',
       }
     },
 

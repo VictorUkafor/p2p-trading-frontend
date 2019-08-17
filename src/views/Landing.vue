@@ -22,11 +22,9 @@
                                 <h1 class="display-3  text-white">The easiest way to buy and sell Bitcoin, Ethereum & Litecoin.
                                 </h1>
                                 <div class="btn-wrapper">
-                                    <base-button tag="a"
-                                                  class="mb-3 mb-sm-0 start-btn"
-                                                 type="info">
-                                        Get Started
-                                    </base-button>
+                                    <router-link to="/register">
+                                    <button class="btn btn-info mb-sm-0">Get Started</button>
+                                    </router-link>
                                 </div>
                             </div>
                         </div>
