@@ -1,105 +1,126 @@
 <template>
-    <section class="section section-shaped section-lg my-0">
-        <div class="shape shape-style-1 bg-gradient-default">
-            <span></span>
-            <span></span>
-            <span></span>
-            <span></span>
-            <span></span>
-            <span></span>
-            <span></span>
-            <span></span>
-        </div>
-        <div class="container pt-lg-md">
-            <div class="row justify-content-center">
-                <div class="col-lg-5">
-
-    <div class="card bg-secondary shadow">
-        <div class="card-body px-lg-5 py-lg-5">
-
-                        <template>
-                            <div class="text-center text-muted mb-4">
-                                <small>Please enter your email and password to login</small>
-                            </div>
-                            <form role="form" method="post" @submit.prevent="processForm">
-
-                                <div v-if="successMessage" class="alert alert-success" role="alert">{{successMessage}}</div>
-                                <div v-if="errorMessage" class="alert alert-danger" role="alert">{{errorMessage}}</div>
-                                
-                                <div class="form-group input-group-alternative">
-                                    <div class="input-group-prepend">
-                                        <span class="input-group-text">
-                                            <slot name="addonLeft">
-                                                <i class="ni ni-email-83"></i>
-                                                </slot>
-                                                </span>
-                                                <input 
-                                        class="form-control"
-                                        type="text"
-                                        placeholder="Email"
-                                        name="email"
-                                        v-model="email"
-                                        @keyup="emailValidate()"
-                                        aria-describedby="addon-right addon-left">
-                                                </div>
-                                        
-                                    </div>
-
-                                    <div v-if="errors.email" 
-                                   class="alert alert-danger" 
-                                   role="alert">{{errors.email}}</div>
-                                    
-                                <div class="form-group input-group-alternative">
-                                    <div class="input-group-prepend">
-                                        <span class="input-group-text">
-                                            <slot name="addonLeft">
-                                                <i class="ni ni-lock-circle-open"></i>
-                                                </slot>
-                                                </span>
-                                                <input 
-                                        class="form-control"
-                                        type="password"
-                                        placeholder="Password"
-                                        name="password"
-                                        v-model="password"
-                                        @keyup="passwordValidate()"
-                                        aria-describedby="addon-right addon-left">
-                                                </div>
-                                        
-                                    </div>
-
-                                  <div v-if="errors.password" 
-                                   class="alert alert-danger" 
-                                   role="alert">{{errors.password}}</div>
-                                <div class="text-center">
-                                    
-                                    <button v-if="loading" disabled class="btn btn-primary my-4">Loading . . .</button>
-                                    <button v-if="!loading" :disabled=noErrors() class="btn btn-primary my-4">Login</button>
-                                </div>
-                            </form>
-
-                    <div class="row mt-3">
-                        <div class="col-6">
-                            <a href="/password-reset/request" class="text-light">
-                                <small>Forgot password?</small>
-                            </a>
-                        </div>
-                        <div class="col-6 text-right">
-                            <a href="/register" class="text-light">
-                                <small>Create new account</small>
-                            </a>
-                        </div>
-                    </div>
-
-                        </template>
-            
-        </div>
+  <section class="section section-shaped section-lg my-0">
+    <div class="shape shape-style-1 bg-gradient-default">
+      <span/>
+      <span/>
+      <span/>
+      <span/>
+      <span/>
+      <span/>
+      <span/>
+      <span/>
     </div>
+    <div class="container pt-lg-md">
+      <div class="row justify-content-center">
+        <div class="col-lg-5">
 
+          <div class="card bg-secondary shadow">
+            <div class="card-body px-lg-5 py-lg-5">
+
+              <template>
+                <div class="text-center text-muted mb-4">
+                  <small>Please enter your email and password to login</small>
                 </div>
+                <form 
+                  role="form" 
+                  method="post" 
+                  @submit.prevent="processForm">
+
+                  <div 
+                    v-if="successMessage" 
+                    class="alert alert-success" 
+                    role="alert">{{ successMessage }}</div>
+                  <div 
+                    v-if="errorMessage" 
+                    class="alert alert-danger" 
+                    role="alert">{{ errorMessage }}</div>
+                                
+                  <div class="form-group input-group-alternative">
+                    <div class="input-group-prepend">
+                      <span class="input-group-text">
+                        <slot name="addonLeft">
+                          <i class="ni ni-email-83"/>
+                        </slot>
+                      </span>
+                      <input 
+                        v-model="email"
+                        class="form-control"
+                        type="text"
+                        placeholder="Email"
+                        name="email"
+                        aria-describedby="addon-right addon-left"
+                        @keyup="emailValidate()">
+                    </div>
+                                        
+                  </div>
+
+                  <div 
+                    v-if="errors.email" 
+                    class="alert alert-danger" 
+                    role="alert">{{ errors.email }}</div>
+                                    
+                  <div class="form-group input-group-alternative">
+                    <div class="input-group-prepend">
+                      <span class="input-group-text">
+                        <slot name="addonLeft">
+                          <i class="ni ni-lock-circle-open"/>
+                        </slot>
+                      </span>
+                      <input 
+                        v-model="password"
+                        class="form-control"
+                        type="password"
+                        placeholder="Password"
+                        name="password"
+                        aria-describedby="addon-right addon-left"
+                        @keyup="passwordValidate()">
+                    </div>
+                                        
+                  </div>
+
+                  <div 
+                    v-if="errors.password" 
+                    class="alert alert-danger" 
+                    role="alert">{{ errors.password }}</div>
+                  <div class="text-center">
+                                    
+                    <button 
+                      v-if="loading" 
+                      disabled 
+                      class="btn btn-primary my-4">Loading . . .</button>
+                    <button 
+                      v-if="!loading" 
+                      :disabled="noErrors()" 
+                      class="btn btn-primary my-4">Login</button>
+                  </div>
+                </form>
+
+                <div class="row mt-3">
+                  <div class="col-6">
+                    <a 
+                      href="/password-reset/request" 
+                      class="text-light">
+                      <small>Forgot password?</small>
+                    </a>
+                  </div>
+                  <div class="col-6 text-right">
+                    <a 
+                      href="/register" 
+                      class="text-light">
+                      <small>Create new account</small>
+                    </a>
+                  </div>
+                </div>
+
+              </template>
+            
             </div>
+          </div>
+
         </div>
-    </section>
+      </div>
+    </div>
+  </section>
 </template>
 <script>
 import axios from 'axios';
@@ -147,7 +168,7 @@ export default {
             this.errors = {
                 email: '',
                 password: '',
-                };
+            };
         },
         submit() {
             this.loading = true;
@@ -161,7 +182,6 @@ export default {
             body).then(res => {
                 this.setState();
                 this.successMessage = 'successfull';
-                console.log(res);
             }).catch(e => {
                 this.setState();
                 this.successMessage = '';
@@ -169,7 +189,6 @@ export default {
                 this.errorMessage = e.response.data.errorMessage ||
                 e.response.data.errors || 
                 'Your request could not be process at this time, please try again later';
-                console.log(e.response, 'errorsssss');
             })
         },
         processForm() {

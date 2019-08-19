@@ -21,8 +21,7 @@
                 <div 
                   v-if="tokenValid" 
                   class="text-center text-muted mb-4">
-                  <small>Please fill the following details to 
-                  complete your registration</small>
+                  <small>Please enter your new password twice to reset your password</small>
                 </div>
                 <form 
                   role="form" 
@@ -37,83 +36,6 @@
                     v-if="errorMessage" 
                     class="alert alert-danger" 
                     role="alert">{{ errorMessage }}</div>
-
-                  <div 
-                    v-if="tokenValid" 
-                    class="form-group input-group-alternative">
-                    <div class="input-group-prepend">
-                      <span class="input-group-text">
-                        <slot name="addonLeft">
-                          <i class="ni ni-hat-3"/>
-                        </slot>
-                      </span>
-                      <input 
-                        v-model="firstName"
-                        class="form-control"
-                        type="text"
-                        placeholder="First Name"
-                        name="firstName"
-                        aria-describedby="addon-right addon-left"
-                        @keyup="firstNameValidate()">
-                    </div>
-                  </div>
-
-                  <div 
-                    v-if="errors.firstName" 
-                    class="alert alert-danger" 
-                    role="alert">{{ errors.firstName }}</div>
-
-                  <div 
-                    v-if="tokenValid" 
-                    class="form-group input-group-alternative">
-                    <div class="input-group-prepend">
-                      <span class="input-group-text">
-                        <slot name="addonLeft">
-                          <i class="ni ni-hat-3"/>
-                        </slot>
-                      </span>
-                      <input 
-                        v-model="lastName"
-                        class="form-control"
-                        type="text"
-                        placeholder="Last Name"
-                        name="lastName"
-                        aria-describedby="addon-right addon-left"
-                        @keyup="lastNameValidate()">
-                    </div>
-                                        
-                  </div>
-
-                  <div 
-                    v-if="errors.lastName" 
-                    class="alert alert-danger" 
-                    role="alert">{{ errors.lastName }}</div>
-
-                  <div 
-                    v-if="tokenValid" 
-                    class="form-group input-group-alternative">
-                    <div class="input-group-prepend">
-                      <span class="input-group-text">
-                        <slot name="addonLeft">
-                          <i class="ni ni-email-84"/>
-                        </slot>
-                      </span>
-                      <input 
-                        v-model="dateOfBirth"
-                        class="form-control"
-                        type="text"
-                        placeholder="Date of Birth"
-                        name="dateOfBirth"
-                        aria-describedby="addon-right addon-left"
-                        @keyup="dobValidate()">
-                    </div>
-                                        
-                  </div>
-
-                  <div 
-                    v-if="errors.dateOfBirth" 
-                    class="alert alert-danger" 
-                    role="alert">{{ errors.dateOfBirth }}</div>
 
                   <div 
                     v-if="tokenValid" 
@@ -182,7 +104,7 @@
                   </div>
                 </form>
               </template>
-            
+                        
             </div>
           </div>
 
@@ -194,27 +116,18 @@
 <script>
 import axios from 'axios';
 import { 
-    validateName, 
-    validateDate,
     validatePassword,
     validatePassConf,
     } from '../lib/validations';
-
 
 const api = process.env.VUE_APP_BACKEND_API;
 
 export default {
   data() {
     return {
-        firstName: '',
-        lastName: '',
-        dateOfBirth: '',
         password: '',
         passwordConfirmation: '',
         errors: {
-            firstName: '',
-            lastName: '',
-            dateOfBirth: '',
             password: '',
             passwordConfirmation: ''
         },
@@ -226,37 +139,17 @@ export default {
     };
   },
     created() {
-        axios.get(`${api}/auth/find-token/${this.$route.params.token}`)
-        .then(()=> {
-            this.tokenValid = true;
-        }).catch(e => {
-            this.tokenValid = false;
-            this.errorMessage = e.response.data.errorMessage;
-            console.log('fdffdf', e.response)
-        });
-    },
+
+            axios.get(`${api}/auth/password-reset/find/${this.$route.params.token}`)
+            .then(()=> {
+                this.tokenValid = true;
+            }).catch(e => {
+                this.tokenValid = false;
+                this.errorMessage = e.response.data.errorMessage;
+            });
+
+  },
   methods: {
-        firstNameValidate() {
-            this.errorMessage = '';
-            this.successMessage = '';
-            const { error, isValid } = validateName(this.firstName, 'First Name');
-            this.errors.firstName = error;
-            this.isValid = isValid;
-        },
-        lastNameValidate() {
-            this.errorMessage = '';
-            this.successMessage = '';
-            const { error, isValid } = validateName(this.lastName, 'Last Name');
-            this.errors.lastName = error;
-            this.isValid = isValid;
-        },
-        dobValidate() {
-            this.errorMessage = '';
-            this.successMessage = '';
-            const { error, isValid } = validateDate(this.dateOfBirth);
-            this.errors.dateOfBirth = error;
-            this.isValid = isValid;
-        },
         passwordValidate() {
             this.errorMessage = '';
             this.successMessage = '';
@@ -273,9 +166,6 @@ export default {
             this.isValid = isValid;
         },
         setState(){
-            this.firstName = '';
-            this.lastName = '';
-            this.dateOfBirth = '';
             this.password = '';
             this.passwordConfirmation = '';
             this.loading = false;
@@ -283,60 +173,32 @@ export default {
             this.errorMessage = '';
             this.successMessage = '';
             this.errors = {
-            firstName: '',
-            lastName: '',
-            dateOfBirth: '',
-            password: '',
-            passwordConfirmation: ''
-        };
-        },
-        formatDOB(date){
-            const split = date.split('/');
-            return `${split[2]}-${split[1]}-${split[0]}`;
-
+                password: '',
+                passwordConfirmation: ''
+            };
         },
         submit() {
             this.loading = true;
 
             const body = {
-                first_name: this.firstName.trim(),
-                last_name: this.lastName.trim(),
-                date_of_birth: this.formatDOB(this.dateOfBirth.trim()),
                 password: this.password.trim(),
                 password_confirmation: this.passwordConfirmation.trim()
             }
 
-            axios.post(`${api}/auth/account-activation/${this.$route.params.token}`, 
+            axios.post(`${api}/auth/password-reset/reset/${this.$route.params.token}`, 
             body).then(res => {
                 this.setState();
                 this.successMessage = res.data.successMessage;
-                console.log(res);
             }).catch(e => {
                 this.successMessage = '';
                 this.loading = false;
                 this.errorMessage = e.response.data.errorMessage ||
                 e.response.data.errors || 
                 'Your request could not be process at this time, please try again later';
-                console.log(e.response, 'errorsssss');
             });
         },
         processForm() {
             let status = true;
-
-            if(status){
-                this.firstNameValidate();
-                status = this.isValid;
-            }
-
-            if(status){
-                this.lastNameValidate();
-                status = this.isValid;
-            }
-
-            if(status){
-                this.dobValidate();
-                status = this.isValid;
-            }
 
             if(status){
                 this.passwordValidate();
@@ -354,10 +216,9 @@ export default {
  
         },
         noErrors(){
-
-            return (!this.firstName || !this.lastName &&
-            !this.dateOfBirth || !this.password ||
-            !this.passwordConfirmation) || !this.isValid;
+            return !this.password ||
+            !this.passwordConfirmation || 
+            !this.isValid;
         }
 
     },

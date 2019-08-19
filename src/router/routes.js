@@ -5,6 +5,7 @@ import Register from '../views/Register';
 import AccountActivation from '../views/AccountActivation';
 import Login from '../views/Login';
 import ResetRequest from '../views/ResetRequest';
+import ResetPassword from '../views/ResetPassword';
 
 
 export default [
@@ -66,6 +67,18 @@ export default [
     },
     meta: {
       title: 'Password Reset Request - P2P Trading',
+    },
+  },
+  {
+    path: '/password-reset/:token',
+    name: 'reset-password',
+    components: {
+      header: AppHeader,
+      default: ResetPassword,
+      footer: AppFooter
+    },
+    meta: {
+      title: 'Password Reset Process - P2P Trading',
     },
   }
 ];

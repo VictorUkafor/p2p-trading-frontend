@@ -1,21 +1,21 @@
 <template>
-    <footer class="footer has-cards">
-        <div class="container">
+  <footer class="footer has-cards">
+    <div class="container">
 
-            <hr>
-            <div class="row align-items-center justify-content-md-between">
-                <div class="col-md-6">
-                    <div class="copyright">
-                        &copy; {{year}} P2P Trading
-                    </div>
-                </div>
-            </div>
+      <hr>
+      <div class="row align-items-center justify-content-md-between">
+        <div class="col-md-6">
+          <div class="copyright">
+            &copy; {{ year }} P2P Trading
+          </div>
         </div>
-    </footer>
+      </div>
+    </div>
+  </footer>
 </template>
 <script>
 export default {
-  name: 'app-footer',
+  name: 'AppFooter',
   data() {
     return {
       year: new Date().getFullYear()
