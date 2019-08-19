@@ -237,6 +237,8 @@ export default {
             this.passwordConfirmation = '';
             this.loading = false;
             this.isValid = false;
+            this.errorMessage = '';
+            this.successMessage = '';
             this.errors = {
             firstName: '',
             lastName: '',
@@ -264,7 +266,6 @@ export default {
             axios.post(`${api}/auth/account-activation/${this.$route.params.token}`, 
             body).then(res => {
                 this.setState();
-                this.errorMessage = '';
                 this.successMessage = res.data.successMessage;
                 console.log(res);
             }).catch(e => {
@@ -317,7 +318,7 @@ export default {
         }
 
     },
-    beforeCreate() {
+    created() {
 
             axios.get(`${api}/auth/find-token/${this.$route.params.token}`).then(()=> {
                 this.tokenValid = true;
