@@ -25,6 +25,7 @@
 
                                 <div v-if="message" class="alert alert-success" role="alert">{{message}}</div>
                                 <div v-if="error" class="alert alert-danger" role="alert">{{error}}</div>
+                                
                                 <div class="form-group input-group-alternative">
                                     <div class="input-group-prepend">
                                         <span class="input-group-text">
@@ -44,27 +45,10 @@
                                         
                                     </div>
                                     
-                                    <div class="custom-control custom-checkbox">
-                                        <input id="cbId"
-                                        class="custom-control-input"
-                                        type="checkbox"
-                                        name="term"
-                                        @change="termValidate()"
-                                        v-model="term"
-                                        />
-                                        <label for="cbId" class="custom-control-label">
-                                            <span>I agree with the
-                                        <a href="#">Privacy Policy</a>
-                                    </span>
-                                    <slot>
-                                        </slot>
-                                        </label>
-                                        </div>
-
                                 <div class="text-center">
                                     
                                     <button v-if="loading" disabled class="btn btn-primary my-4">Loading . . .</button>
-                                    <button v-if="!loading" :disabled="!isValid || !term" class="btn btn-primary my-4">Submit</button>
+                                    <button v-if="!loading" :disabled="!isValid" class="btn btn-primary my-4">Submit</button>
                                 </div>
                             </form>
                         </template>
@@ -79,15 +63,14 @@
 </template>
 <script>
 import axios from 'axios';
-import { validateEmail, validateTerm } from '../lib/validations';
+import { validateEmail } from '../lib/validations';
 
-
+const api = process.env.VUE_APP_BACKEND_API;
 
 export default {
   data() {
     return {
         email: '',
-        term: true,
         error: '',
         message: '',
         isValid: false,
@@ -97,13 +80,8 @@ export default {
   methods: {
         emailValidate() {
             this.message = '';
+            this.error = '';
             const { error, isValid } = validateEmail(this.email);
-            this.error = error;
-            this.isValid = isValid;
-        },
-        termValidate() {
-            this.message = '';
-            const { error, isValid } = validateTerm(this.term);
             this.error = error;
             this.isValid = isValid;
         },
@@ -111,21 +89,21 @@ export default {
             this.loading = true;
             const body = { email: this.email.trim() };
 
-            axios.post(`${process.env.VUE_APP_BACKEND_API}/auth/register`,
+            console.log('email.....', this.email);
+
+            axios.post(`${api}/auth/password-reset/request`,
             body).then(res => {
                 this.loading = false;
                 this.email = '';
-                this.term = false;
                 this.isValid = false;
                 this.message = res.data.successMessage;
                 console.log(res);
             }).catch(e => {
                 this.loading = false;
-                this.email = '';
-                this.term = false;
                 this.isValid = false;
                 this.error = e.response.data.errorMessage ||
-                 e.response.data.errors.email[0];
+                e.response.data.errors.email[0] || 
+                'Your request could not be process at this time, please try again later';
                 console.log(e.response, 'errorsssss');
             })
         },
@@ -134,11 +112,6 @@ export default {
 
             if(status){
                 this.emailValidate();
-                status = this.isValid;
-            }
-
-            if(status){
-                this.termValidate();
                 status = this.isValid;
             }
             

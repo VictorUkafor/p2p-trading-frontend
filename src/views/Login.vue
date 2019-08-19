@@ -77,6 +77,20 @@
                                     <button v-if="!loading" :disabled=noErrors() class="btn btn-primary my-4">Login</button>
                                 </div>
                             </form>
+
+                    <div class="row mt-3">
+                        <div class="col-6">
+                            <a href="/password-reset/request" class="text-light">
+                                <small>Forgot password?</small>
+                            </a>
+                        </div>
+                        <div class="col-6 text-right">
+                            <a href="/register" class="text-light">
+                                <small>Create new account</small>
+                            </a>
+                        </div>
+                    </div>
+
                         </template>
             
         </div>

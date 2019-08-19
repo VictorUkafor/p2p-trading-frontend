@@ -19,12 +19,14 @@
             <ul class="navbar-nav navbar-nav-hover align-items-lg-center">
             </ul>
             <ul class="navbar-nav align-items-lg-center ml-lg-auto">
+                <router-link to="/login">
                 <li class="nav-item d-none d-lg-block ml-lg-4 btn btn-neutral btn-icon">
                 <span class="btn-inner--icon">
                   <i class="fa fa-sign-in mr-2"></i>
                 </span>
                 <span class="nav-link-inner--text">Login</span>
                 </li>
+                </router-link>
             </ul>
         </base-nav>
     </header>
