@@ -4,6 +4,7 @@ import AppHeader from "../layout/AppHeader";
 import AppFooter from "../layout/AppFooter";
 import Landing from '../views/Landing';
 import Register from '../views/Register';
+import AccountActivation from '../views/AccountActivation';
 
 Vue.use(Router);
 
@@ -35,6 +36,18 @@ export default new Router({
         title: 'Register - P2P Trading',
       }
     },
+    {
+      path: '/account-activation/:token',
+      name: "activation",
+      components: {
+        header: AppHeader,
+        default: AccountActivation,
+        footer: AppFooter
+      },
+    meta: {
+      title: 'Account Activation - P2P Trading',
+    }
+  },
 
   ],
   scrollBehavior: to => {
