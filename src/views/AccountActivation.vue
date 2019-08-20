@@ -95,7 +95,7 @@
                     <div class="input-group-prepend">
                       <span class="input-group-text">
                         <slot name="addonLeft">
-                          <i class="ni ni-email-84"/>
+                          <i class="ni ni-calender-grid-58"/>
                         </slot>
                       </span>
                       <input 

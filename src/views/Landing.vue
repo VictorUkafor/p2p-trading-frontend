@@ -45,7 +45,7 @@
                   shadow 
                   body-classes="py-5">
                   <icon 
-                    name="ni ni-delivery-fast" 
+                    name="ni ni-send" 
                     type="primary" 
                     rounded 
                     class="mb-4"/>

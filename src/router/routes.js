@@ -6,6 +6,7 @@ import AccountActivation from '../views/AccountActivation';
 import Login from '../views/Login';
 import ResetRequest from '../views/ResetRequest';
 import ResetPassword from '../views/ResetPassword';
+import Dashboard from '../views/Dashboard';
 
 
 export default [
@@ -79,6 +80,18 @@ export default [
     },
     meta: {
       title: 'Password Reset Process - P2P Trading',
+    },
+  },
+  {
+    path: '/dashboard',
+    name: 'dashboard',
+    components: {
+      header: AppHeader,
+      default: Dashboard,
+      footer: AppFooter
+    },
+    meta: {
+      title: 'Dashboard - P2P Trading',
     },
   }
 ];
