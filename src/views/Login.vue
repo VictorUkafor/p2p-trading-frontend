@@ -26,14 +26,16 @@
                   method="post" 
                   @submit.prevent="processForm">
 
-                  <div 
+                  <!-- <div 
                     v-if="successMessage" 
                     class="alert alert-success" 
-                    role="alert">{{ successMessage }}</div>
+                    role="alert">{{ successMessage }}
+                  </div> -->
                   <div 
-                    v-if="errorMessage" 
+                    v-if="getError" 
                     class="alert alert-danger" 
-                    role="alert">{{ errorMessage }}</div>
+                    role="alert">{{ getError }}
+                  </div>
                                 
                   <div class="form-group input-group-alternative">
                     <div class="input-group-prepend">
@@ -87,11 +89,11 @@
                     <button 
                       v-if="loading" 
                       disabled 
-                      class="btn btn-primary my-4">Loading . . .</button>
+                      class="btn btn-neutral my-4">Loading . . .</button>
                     <button 
                       v-if="!loading" 
                       :disabled="noErrors()" 
-                      class="btn btn-primary my-4">Login</button>
+                      class="btn btn-default my-4">Login</button>
                   </div>
                 </form>
 
@@ -124,6 +126,7 @@
 </template>
 <script>
 import axios from 'axios';
+import { mapGetters, mapActions } from 'vuex';
 import { validateEmail, validateName } from '../lib/validations';
 
 const api = process.env.VUE_APP_BACKEND_API;
@@ -137,83 +140,73 @@ export default {
             email: '',
             password: '',            
         },
-        successMessage: '',
-        errorMessage: '',
         isValid: false,
         loading: false,
     };
   },
   methods: {
-        emailValidate() {
-            this.errorMessage = '';
-            this.successMessage = '';
-            const { error, isValid } = validateEmail(this.email);
-            this.errors.email = error;
-            this.isValid = isValid;
-        },
-        passwordValidate() {
-            this.errorMessage = '';
-            this.successMessage = '';
-            const { error, isValid } = validateName(this.password, 'password');
-            this.errors.password = error;
-            this.isValid = isValid;
-        },
-        setState(){
-            this.email = '';
-            this.password = '';
-            this.loading = false;
-            this.isValid = false;
-            this.errorMessage = '';
-            this.successMessage = '';
-            this.errors = {
-                email: '',
-                password: '',
-            };
-        },
-        submit() {
-            this.loading = true;
+    ...mapActions(['loginUser']),
+    emailValidate() {
+      this.errorMessage = '';
+      this.successMessage = '';
+      const { error, isValid } = validateEmail(this.email);
+      this.errors.email = error;
+      this.isValid = isValid;
+    },
+    passwordValidate() {
+      const { error, isValid } = validateName(this.password, 'password');
+      this.errors.password = error;
+      this.isValid = isValid;
+    },
+    setState(){
+      this.email = '';
+      this.password = '';
+      this.loading = false;
+      this.isValid = false;
+      this.errors = {
+        email: '',
+        password: '',
+      };
+    },
+    submit() {
+      this.loading = true;
 
-            const body = {
-                email: this.email.trim(),
-                password: this.password.trim()
-            }
+      const body = {
+        email: this.email.trim(),
+        password: this.password.trim()
+      }
 
-            axios.post(`${process.env.VUE_APP_BACKEND_API}/auth/login`,
-            body).then(res => {
-                this.setState();
-                this.successMessage = 'successfull';
-            }).catch(e => {
-                this.setState();
-                this.successMessage = '';
-                this.loading = false;
-                this.errorMessage = e.response.data.errorMessage ||
-                e.response.data.errors || 
-                'Your request could not be process at this time, please try again later';
-            })
-        },
-        processForm() {
-            let status = true;
-
-            if(status){
-                this.emailValidate();
-                status = this.isValid;
-            }
-
-            if(status){
-                this.passwordValidate();
-                status = this.isValid;
-            }
-            
-            if(status){
-                this.submit();
-            }
- 
-        },
-        noErrors(){
-            return (!this.email || !this.password) || !this.isValid;
-        }
+      this.loginUser(body)
+      .then(() => {
+        this.setState();
+      });
 
     },
+    processForm() {
+      let status = true;
+
+      if(status){
+        this.emailValidate();
+        status = this.isValid;
+      }
+
+      if(status){
+        this.passwordValidate();
+        status = this.isValid;
+      }
+            
+      if(status){
+        this.submit();
+      }
+ 
+    },
+    noErrors(){
+      return (!this.email || !this.password) || !this.isValid;
+    }
+    
+  },
+  computed: mapGetters(['getError']),
+
     
 };
 

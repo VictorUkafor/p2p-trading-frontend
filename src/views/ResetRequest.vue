@@ -59,11 +59,11 @@
                     <button 
                       v-if="loading" 
                       disabled 
-                      class="btn btn-primary my-4">Loading . . .</button>
+                      class="btn btn-neutral my-4">Loading . . .</button>
                     <button 
                       v-if="!loading" 
                       :disabled="!isValid" 
-                      class="btn btn-primary my-4">Submit</button>
+                      class="btn btn-default my-4">Submit</button>
                   </div>
                 </form>
               </template>

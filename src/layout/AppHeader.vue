@@ -11,26 +11,13 @@
         class="navbar-brand mr-lg-5" 
         to="/">
         <img 
+        @click="landingPage"
           src="../assets/img/brand/white.png" 
           alt="logo">
       </router-link>
 
-      <div 
-        slot="content-header" 
-        slot-scope="{closeMenu}" 
-        class="row">
-        <div class="col-6 collapse-brand">
-          <a href="/">
-            <img src="../assets/img/brand/blue.png">
-          </a>
-        </div>
-        <div class="col-6 collapse-close">
-          <close-button @click="closeMenu"/>
-        </div>
-      </div>
-
       <ul v-if="getAuth" class="navbar-nav navbar-nav-hover align-items-lg-center">
-        <li class="nav-item">
+        <li class="nav-item" :class="getPage === 'dashboard' ? 'active': ''">
                     <a href="/dashboard" class="nav-link">
                         <i class="ni ni-collection"></i>
                         <span class="nav-link-inner--text">Dashboard</span>
@@ -75,28 +62,24 @@
       </ul>
 
       <ul class="navbar-nav align-items-lg-center ml-lg-auto">
-        <router-link v-if="!getAuth" to="/login">
-          <li class="btn btn-neutral">
+        <li v-if="!getAuth && getPage !== 'login'" @click="logIn" class="btn btn-neutral">
             <span class="btn-inner--icon">
               <i class="fa fa-sign-in mr-2"/>
             </span>
             <span class="nav-link-inner--text">Login</span>
           </li>
-        </router-link>
-        <router-link v-if="getAuth" to="#">
-          <li class="nav-item d-none d-lg-block ml-lg-4 btn btn-neutral btn-icon">
+          <li v-if="getAuth" @click="logOut" class="btn btn-neutral">
             <span class="btn-inner--icon">
               <i class="fa fa-sign-out mr-2"/>
             </span>
             <span class="nav-link-inner--text">Logout</span>
           </li>
-        </router-link>
       </ul>
     </base-nav>
   </header>
 </template>
 <script>
-import { mapGetters } from 'vuex';
+import { mapGetters, mapActions } from 'vuex';
 import BaseNav from "@/components/BaseNav";
 import BaseDropdown from "@/components/BaseDropdown";
 import CloseButton from "@/components/CloseButton";
@@ -108,7 +91,21 @@ export default {
     CloseButton,
     BaseDropdown
   },
-  computed: mapGetters(['getAuth']),
+  methods: {
+    ...mapActions(['logOut']),
+    logIn(event){
+      this.$store.commit('setPage', 'login');
+      this.$router.push('/login');
+    },
+    landingPage(event){
+      this.$store.commit('setPage', 'landing');
+      this.$router.push('/landing');
+    }
+  
+
+  },
+  computed: mapGetters(['getAuth', 'getPage']),
+  
 };
 </script>
 <style>
