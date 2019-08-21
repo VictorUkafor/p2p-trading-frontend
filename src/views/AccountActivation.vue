@@ -19,7 +19,7 @@
 
               <template>
                 <div 
-                  v-if="tokenValid" 
+                  v-if="getActToken" 
                   class="text-center text-muted mb-4">
                   <small>Please fill the following details to 
                   complete your registration</small>
@@ -30,16 +30,16 @@
                   @submit.prevent="processForm">
 
                   <div 
-                    v-if="successMessage" 
+                    v-if="getMessage" 
                     class="alert alert-success" 
-                    role="alert">{{ successMessage }}</div>
+                    role="alert">{{ getMessage }}</div>
                   <div 
-                    v-if="errorMessage" 
+                    v-if="getError" 
                     class="alert alert-danger" 
-                    role="alert">{{ errorMessage }}</div>
+                    role="alert">{{ getError }}</div>
 
                   <div 
-                    v-if="tokenValid" 
+                    v-if="getActToken" 
                     class="form-group input-group-alternative">
                     <div class="input-group-prepend">
                       <span class="input-group-text">
@@ -64,7 +64,7 @@
                     role="alert">{{ errors.firstName }}</div>
 
                   <div 
-                    v-if="tokenValid" 
+                    v-if="getActToken" 
                     class="form-group input-group-alternative">
                     <div class="input-group-prepend">
                       <span class="input-group-text">
@@ -90,7 +90,7 @@
                     role="alert">{{ errors.lastName }}</div>
 
                   <div 
-                    v-if="tokenValid" 
+                    v-if="getActToken" 
                     class="form-group input-group-alternative">
                     <div class="input-group-prepend">
                       <span class="input-group-text">
@@ -116,7 +116,7 @@
                     role="alert">{{ errors.dateOfBirth }}</div>
 
                   <div 
-                    v-if="tokenValid" 
+                    v-if="getActToken" 
                     class="form-group input-group-alternative">
                     <div class="input-group-prepend">
                       <span class="input-group-text">
@@ -143,7 +143,7 @@
 
 
                   <div 
-                    v-if="tokenValid" 
+                    v-if="getActToken" 
                     class="form-group input-group-alternative">
                     <div class="input-group-prepend">
                       <span class="input-group-text">
@@ -176,7 +176,7 @@
                       disabled 
                       class="btn btn-neutral my-4">Loading . . .</button>
                     <button 
-                      v-if="!loading && tokenValid" 
+                      v-if="!loading && getActToken" 
                       :disabled="noErrors()" 
                       class="btn btn-default my-4">Complete Registration</button>
                   </div>
@@ -193,175 +193,145 @@
 </template>
 <script>
 import axios from 'axios';
+import { mapGetters, mapActions } from 'vuex';
 import { 
     validateName, 
     validateDate,
     validatePassword,
     validatePassConf,
-    } from '../lib/validations';
+  } from '../lib/validations';
 
-
-const api = process.env.VUE_APP_BACKEND_API;
 
 export default {
   data() {
     return {
+      firstName: '',
+      lastName: '',
+      dateOfBirth: '',
+      password: '',
+      passwordConfirmation: '',
+      errors: {
         firstName: '',
         lastName: '',
         dateOfBirth: '',
         password: '',
-        passwordConfirmation: '',
-        errors: {
-            firstName: '',
-            lastName: '',
-            dateOfBirth: '',
-            password: '',
-            passwordConfirmation: ''
-        },
-        errorMessage: '',
-        successMessage: '',
-        isValid: false,
-        loading: false,
-        tokenValid: true,
+        passwordConfirmation: ''
+      },
+      isValid: false,
+      loading: false,
     };
   },
-    created() {
-        axios.get(`${api}/auth/find-token/${this.$route.params.token}`)
-        .then(()=> {
-            this.tokenValid = true;
-        }).catch(e => {
-            this.tokenValid = false;
-            this.errorMessage = e.response.data.errorMessage;
-            console.log('fdffdf', e.response)
-        });
-    },
+  created() {
+    findActivationToken(this.$route.params.token);
+  },
   methods: {
-        firstNameValidate() {
-            this.errorMessage = '';
-            this.successMessage = '';
-            const { error, isValid } = validateName(this.firstName, 'First Name');
-            this.errors.firstName = error;
-            this.isValid = isValid;
-        },
-        lastNameValidate() {
-            this.errorMessage = '';
-            this.successMessage = '';
-            const { error, isValid } = validateName(this.lastName, 'Last Name');
-            this.errors.lastName = error;
-            this.isValid = isValid;
-        },
-        dobValidate() {
-            this.errorMessage = '';
-            this.successMessage = '';
-            const { error, isValid } = validateDate(this.dateOfBirth);
-            this.errors.dateOfBirth = error;
-            this.isValid = isValid;
-        },
-        passwordValidate() {
-            this.errorMessage = '';
-            this.successMessage = '';
-            const { error, isValid } = validatePassword(this.password);
-            this.errors.password = error;
-            this.isValid = isValid;
-        },
-        passConfValidate() {
-            this.errorMessage = '';
-            this.successMessage = '';
-            const { error, isValid } = 
-            validatePassConf(this.password, this.passwordConfirmation);
-            this.errors.passwordConfirmation = error;
-            this.isValid = isValid;
-        },
-        setState(){
-            this.firstName = '';
-            this.lastName = '';
-            this.dateOfBirth = '';
-            this.password = '';
-            this.passwordConfirmation = '';
-            this.loading = false;
-            this.isValid = false;
-            this.errorMessage = '';
-            this.successMessage = '';
-            this.errors = {
-            firstName: '',
-            lastName: '',
-            dateOfBirth: '',
-            password: '',
-            passwordConfirmation: ''
-        };
-        },
-        formatDOB(date){
-            const split = date.split('/');
-            return `${split[2]}-${split[1]}-${split[0]}`;
-
-        },
-        submit() {
-            this.loading = true;
-
-            const body = {
-                first_name: this.firstName.trim(),
-                last_name: this.lastName.trim(),
-                date_of_birth: this.formatDOB(this.dateOfBirth.trim()),
-                password: this.password.trim(),
-                password_confirmation: this.passwordConfirmation.trim()
-            }
-
-            axios.post(`${api}/auth/account-activation/${this.$route.params.token}`, 
-            body).then(res => {
-                this.setState();
-                this.successMessage = res.data.successMessage;
-                console.log(res);
-            }).catch(e => {
-                this.successMessage = '';
-                this.loading = false;
-                this.errorMessage = e.response.data.errorMessage ||
-                e.response.data.errors || 
-                'Your request could not be process at this time, please try again later';
-                console.log(e.response, 'errorsssss');
-            });
-        },
-        processForm() {
-            let status = true;
-
-            if(status){
-                this.firstNameValidate();
-                status = this.isValid;
-            }
-
-            if(status){
-                this.lastNameValidate();
-                status = this.isValid;
-            }
-
-            if(status){
-                this.dobValidate();
-                status = this.isValid;
-            }
-
-            if(status){
-                this.passwordValidate();
-                status = this.isValid;
-            }
-
-            if(status){
-                this.passConfValidate();
-                status = this.isValid;
-            }
-            
-            if(status){
-                this.submit();
-            }
- 
-        },
-        noErrors(){
-
-            return (!this.firstName || !this.lastName &&
-            !this.dateOfBirth || !this.password ||
-            !this.passwordConfirmation) || !this.isValid;
-        }
+    ...mapActions(['activateAccount', 'findActivationToken']),
+    firstNameValidate() {
+      this.$store.commit('clearMessages');
+      const { error, isValid } = validateName(this.firstName, 'First Name');
+      this.errors.firstName = error;
+      this.isValid = isValid;
+    },
+    lastNameValidate() {
+      this.$store.commit('clearMessages');
+      const { error, isValid } = validateName(this.lastName, 'Last Name');
+      this.errors.lastName = error;
+      this.isValid = isValid;
+    },
+    dobValidate() {
+      this.$store.commit('clearMessages');
+      const { error, isValid } = validateDate(this.dateOfBirth);
+      this.errors.dateOfBirth = error;
+      this.isValid = isValid;
+    },
+    passwordValidate() {
+      this.$store.commit('clearMessages');
+      const { error, isValid } = validatePassword(this.password);
+      this.errors.password = error;
+      this.isValid = isValid;
+    },
+    passConfValidate() {
+      this.$store.commit('clearMessages');
+      const { error, isValid } = 
+      validatePassConf(this.password, this.passwordConfirmation);
+      this.errors.passwordConfirmation = error;
+      this.isValid = isValid;
+    },
+    initialState(){
+      this.firstName = '';
+      this.lastName = '';
+      this.dateOfBirth = '';
+      this.password = '';
+      this.passwordConfirmation = '';
+      this.loading = false;
+      this.isValid = false;
+      this.errors = {
+        firstName: '',
+        lastName: '',
+        dateOfBirth: '',
+        password: '',
+        passwordConfirmation: ''
+      };
+    },
+    formatDOB(date){
+      const split = date.split('/');
+      return `${split[2]}-${split[1]}-${split[0]}`;
 
     },
+    processForm() {
+      let status = true;
 
+      if(status){
+        this.firstNameValidate();
+        status = this.isValid;
+      }
+
+      if(status){
+        this.lastNameValidate();
+        status = this.isValid;
+      }
+
+      if(status){
+        this.dobValidate();
+        status = this.isValid;
+      }
+
+      if(status){
+        this.passwordValidate();
+        status = this.isValid;
+      }
+
+      if(status){
+        this.passConfValidate();
+        status = this.isValid;
+      }
+            
+      if(status){
+        this.loading = true;
+
+        const body = {
+          first_name: this.firstName.trim(),
+          last_name: this.lastName.trim(),
+          date_of_birth: this.formatDOB(this.dateOfBirth.trim()),
+          password: this.password.trim(),
+          password_confirmation: this.passwordConfirmation.trim()
+        }
+        
+        activateAccount(body, token)
+        .then(() => this.initialState())
+        .catch(() => this.initialState());
+      }
+      
+    },
+    noErrors(){
+      return (!this.firstName || !this.lastName &&
+        !this.dateOfBirth || !this.password ||
+        !this.passwordConfirmation) || !this.isValid;
+    }
+  },
+  computed: mapGetters([
+    'getError', 'getMessage', 'getActToken'
+  ]),
     
 };
 

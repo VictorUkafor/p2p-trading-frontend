@@ -19,7 +19,7 @@
 
               <template>
                 <div 
-                  v-if="tokenValid" 
+                  v-if="getResetToken" 
                   class="text-center text-muted mb-4">
                   <small>Please enter your new password twice to reset your password</small>
                 </div>
@@ -29,16 +29,16 @@
                   @submit.prevent="processForm">
 
                   <div 
-                    v-if="successMessage" 
+                    v-if="getMessage" 
                     class="alert alert-success" 
-                    role="alert">{{ successMessage }}</div>
+                    role="alert">{{ getMessage }}</div>
                   <div 
-                    v-if="errorMessage" 
+                    v-if="getError" 
                     class="alert alert-danger" 
-                    role="alert">{{ errorMessage }}</div>
+                    role="alert">{{ getError }}</div>
 
                   <div 
-                    v-if="tokenValid" 
+                    v-if="getResetToken" 
                     class="form-group input-group-alternative">
                     <div class="input-group-prepend">
                       <span class="input-group-text">
@@ -65,7 +65,7 @@
 
 
                   <div 
-                    v-if="tokenValid" 
+                    v-if="getResetToken" 
                     class="form-group input-group-alternative">
                     <div class="input-group-prepend">
                       <span class="input-group-text">
@@ -98,7 +98,7 @@
                       disabled 
                       class="btn btn-neutral my-4">Loading . . .</button>
                     <button 
-                      v-if="!loading && tokenValid" 
+                      v-if="!loading && getResetToken" 
                       :disabled="noErrors()" 
                       class="btn btn-default my-4">Complete Registration</button>
                   </div>
@@ -115,10 +115,11 @@
 </template>
 <script>
 import axios from 'axios';
+import { mapGetters, mapActions } from 'vuex';
 import { 
     validatePassword,
     validatePassConf,
-    } from '../lib/validations';
+  } from '../lib/validations';
 
 const api = process.env.VUE_APP_BACKEND_API;
 
@@ -128,104 +129,80 @@ export default {
         password: '',
         passwordConfirmation: '',
         errors: {
-            password: '',
-            passwordConfirmation: ''
+          password: '',
+          passwordConfirmation: ''
         },
-        errorMessage: '',
-        successMessage: '',
         isValid: false,
         loading: false,
-        tokenValid: true,
     };
   },
-    created() {
-
-            axios.get(`${api}/auth/password-reset/find/${this.$route.params.token}`)
-            .then(()=> {
-                this.tokenValid = true;
-            }).catch(e => {
-                this.tokenValid = false;
-                this.errorMessage = e.response.data.errorMessage;
-            });
-
+  created() {
+    this.setResetToken(this.$route.params.token);
   },
   methods: {
-        passwordValidate() {
-            this.errorMessage = '';
-            this.successMessage = '';
-            const { error, isValid } = validatePassword(this.password);
-            this.errors.password = error;
-            this.isValid = isValid;
-        },
-        passConfValidate() {
-            this.errorMessage = '';
-            this.successMessage = '';
-            const { error, isValid } = 
-            validatePassConf(this.password, this.passwordConfirmation);
-            this.errors.passwordConfirmation = error;
-            this.isValid = isValid;
-        },
-        setState(){
-            this.password = '';
-            this.passwordConfirmation = '';
-            this.loading = false;
-            this.isValid = false;
-            this.errorMessage = '';
-            this.successMessage = '';
-            this.errors = {
-                password: '',
-                passwordConfirmation: ''
-            };
-        },
-        submit() {
-            this.loading = true;
+    ...mapActions(['setResetToken', 'resetPassword']),
+    passwordValidate() {
+      this.$store.commit('clearMessages');
+      const { error, isValid } = validatePassword(this.password);
+      this.errors.password = error;
+      this.isValid = isValid;
+    },
+    passConfValidate() {
+      this.$store.commit('clearMessages');
+      const { error, isValid } = 
+      validatePassConf(this.password, this.passwordConfirmation);
+      this.errors.passwordConfirmation = error;
+      this.isValid = isValid;
+    },
+    initialState(){
+      this.password = '';
+      this.passwordConfirmation = '';
+      this.loading = false;
+      this.isValid = false;
+      this.errors = {
+        password: '',
+        passwordConfirmation: ''
+      };
+    },
+    processForm() {
+      let status = true;
 
-            const body = {
-                password: this.password.trim(),
-                password_confirmation: this.passwordConfirmation.trim()
-            }
+      if(status){
+        this.passwordValidate();
+        status = this.isValid;
+      }
 
-            axios.post(`${api}/auth/password-reset/reset/${this.$route.params.token}`, 
-            body).then(res => {
-                this.setState();
-                this.successMessage = res.data.successMessage;
-            }).catch(e => {
-                this.successMessage = '';
-                this.loading = false;
-                this.errorMessage = e.response.data.errorMessage ||
-                e.response.data.errors || 
-                'Your request could not be process at this time, please try again later';
-            });
-        },
-        processForm() {
-            let status = true;
-
-            if(status){
-                this.passwordValidate();
-                status = this.isValid;
-            }
-
-            if(status){
-                this.passConfValidate();
-                status = this.isValid;
-            }
+      if(status){
+        this.passConfValidate();
+        status = this.isValid;
+      }
             
-            if(status){
-                this.submit();
-            }
- 
-        },
-        noErrors(){
-            return !this.password ||
-            !this.passwordConfirmation || 
-            !this.isValid;
+      if(status){
+        this.loading = true;
+
+        const body = {
+          password: this.password.trim(),
+          password_confirmation: this.passwordConfirmation.trim()
         }
 
-    },
+        this.resetPassword(body, this.$route.params.token)
+        .then(() => this.initialState())
+        .catch(() => this.initialState());
+      }
 
-    
+    },
+    noErrors(){
+      return !this.password ||
+      !this.passwordConfirmation || 
+      !this.isValid;
+    }
+
+  },
+  computed: mapGetters([
+    'getError', 'getMessage', 'getResetToken'
+  ]),
+  
 };
 
 </script>
-<style>
-</style>
+

@@ -68,7 +68,7 @@
             </span>
             <span class="nav-link-inner--text">Login</span>
           </li>
-          <li v-if="getAuth" @click="logOut" class="btn btn-neutral">
+          <li v-if="getAuth" @click="logout" class="btn btn-neutral">
             <span class="btn-inner--icon">
               <i class="fa fa-sign-out mr-2"/>
             </span>
@@ -96,6 +96,10 @@ export default {
     logIn(event){
       this.$store.commit('setPage', 'login');
       this.$router.push('/login');
+    },
+    logout(event){
+      this.$store.commit('setPage', 'login');
+      this.logOut();
     },
     landingPage(event){
       this.$store.commit('setPage', 'landing');

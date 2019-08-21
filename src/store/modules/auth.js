@@ -8,6 +8,8 @@ const state = {
     successMessage: '',
     errorMessage: '',
     page: '',
+    resetToken: false,
+    activationToken: false,
 };
 
 const getters = {
@@ -15,6 +17,8 @@ const getters = {
     getMessage: state => state.successMessage,
     getError: state => state.errorMessage,
     getPage: state => state.page,
+    getResetToken: state => state.resetToken,
+    getActToken: state => state.activationToken,
 };
 
 const mutations = {
@@ -26,19 +30,79 @@ const mutations = {
         state.successMessage = '';
     },
     setPage: (state, page) => (state.page = page),
+    setResetToken: (state, token) => (state.resetToken = token),
+    setActToken: (state, token) => (state.activationToken = token),
 };
 
 const actions = {
+    async activateAccount({ commit }, body, token) {
+        try{
+            const res = await axios.post(`${api}/auth/account-activation/${token}`, body);
+            commit('setMessage', res.data.successMessage);
+        } catch(e){
+            commit('setError', e.response.data.errorMessage || 
+            e.response.data.errors || 
+            'Your request could not be process at this time, please try again later');
+        }
+    },
+    async resetRequest({ commit }, body) {
+        try{
+            const res = await axios.post(`${api}/auth/password-reset/request`, body);
+            commit('setMessage', res.data.successMessage);
+        } catch(e){
+            commit('setError', e.response.data.errorMessage || 
+            e.response.data.errors.email[0] || 
+            'Your request could not be process at this time, please try again later');
+        }
+    },
+    async findResetToken({ commit }, token) {
+        try{
+            await axios.get(`${api}/auth/password-reset/find/${token}`);
+            commit('setResetToken', true);
+        } catch(e){
+            commit('setError', e.response.data.errorMessage || 
+            e.response.data.errors.email[0] || 
+            'Your request could not be process at this time, please try again later');
+        }
+    },
+    async findActivationToken({ commit }, token) {
+        try{
+            await axios.get(`${api}/auth/find-token/${token}`);
+            commit('setActToken', true);
+        } catch(e){
+            commit('setError', e.response.data.errorMessage || 
+            e.response.data.errors.email[0] || 
+            'Your request could not be process at this time, please try again later');
+        }
+    },
+    async resetPassword({ commit }, body, token) {
+        try{
+            const res = await axios.post(`${api}/auth/password-reset/reset/${token}`, body);
+            commit('setMessage', res.data.successMessage);
+        } catch(e){
+            commit('setError', e.response.data.errorMessage || 
+            e.response.data.errors || 
+            'Your request could not be process at this time, please try again later');
+        }
+    },
+    async registerUser({ commit }, body) {
+        try{
+            const res = await axios.post(`${api}/auth/register`, body);
+            commit('setMessage', res.data.successMessage);
+        } catch(e){
+            commit('setError', e.response.data.errorMessage || 
+            e.response.data.errors.email[0] || 
+            'Your request could not be process at this time, please try again later');
+        }
+    },
     async loginUser({ commit }, body) {
         try{
             const res = await axios.post(`${api}/auth/login`, body);
-            console.log(res.data);
             commit('setAuth', true);
             commit('setPage', 'dashboard');
             localStorage.setItem('token', res.data.token);
             router.push('/dashboard');
         } catch(e){
-            console.log(e.response.data);
             commit('setAuth', false);
             commit('setError', e.response.data.errorMessage || 
             e.response.data.errors || 

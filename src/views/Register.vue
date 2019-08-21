@@ -27,13 +27,13 @@
                   @submit.prevent="processForm">
 
                   <div 
-                    v-if="message" 
+                    v-if="getMessage" 
                     class="alert alert-success" 
-                    role="alert">{{ message }}</div>
+                    role="alert">{{ getMessage }}</div>
                   <div 
-                    v-if="error" 
+                    v-if="error || getError" 
                     class="alert alert-danger" 
-                    role="alert">{{ error }}</div>
+                    role="alert">{{ error || getError }}</div>
                   <div class="form-group input-group-alternative">
                     <div class="input-group-prepend">
                       <span class="input-group-text">
@@ -96,74 +96,69 @@
 </template>
 <script>
 import axios from 'axios';
+import { mapGetters, mapActions } from 'vuex';
 import { validateEmail, validateTerm } from '../lib/validations';
-
-
 
 export default {
   data() {
     return {
-        email: '',
-        term: true,
-        error: '',
-        message: '',
-        isValid: false,
-        loading: false,
+      email: '',
+      term: true,
+      error: '',
+      isValid: false,
+      loading: false,
     };
   },
   methods: {
-        emailValidate() {
-            this.message = '';
-            const { error, isValid } = validateEmail(this.email);
-            this.error = error;
-            this.isValid = isValid;
-        },
-        termValidate() {
-            this.message = '';
-            const { error, isValid } = validateTerm(this.term);
-            this.error = error;
-            this.isValid = isValid;
-        },
-        submit() {
-            this.loading = true;
-            const body = { email: this.email.trim() };
-
-            axios.post(`${process.env.VUE_APP_BACKEND_API}/auth/register`,
-            body).then(res => {
-                this.loading = false;
-                this.email = '';
-                this.term = false;
-                this.isValid = false;
-                this.message = res.data.successMessage;
-            }).catch(e => {
-                this.loading = false;
-                this.email = '';
-                this.term = false;
-                this.isValid = false;
-                this.error = e.response.data.errorMessage ||
-                 e.response.data.errors.email[0];
-            })
-        },
-        processForm() {
-            let status = true;
-
-            if(status){
-                this.emailValidate();
-                status = this.isValid;
-            }
-
-            if(status){
-                this.termValidate();
-                status = this.isValid;
-            }
-            
-            if(status){
-                this.submit();
-            }
- 
-        },
-
+    ...mapActions(['registerUser']),
+    emailValidate() {
+      this.$store.commit('clearMessages');
+      const { error, isValid } = validateEmail(this.email);
+      this.error = error;
+      this.isValid = isValid;
     },
+    termValidate() {
+      this.$store.commit('clearMessages');
+      const { error, isValid } = validateTerm(this.term);
+      this.error = error;
+      this.isValid = isValid;
+    },
+    initialState(){
+      this.loading = false;
+      this.email = '';
+      this.term = true;
+      this.error = '';
+      this.isValid = false;
+    },
+    processForm() {
+      let status = true;
+
+      if(status){
+        this.emailValidate();
+        status = this.isValid;
+      }
+
+      if(status){
+        this.termValidate();
+        status = this.isValid;
+      }
+            
+      if(status){
+        this.loading = true;
+        const body = { email: this.email.trim() };
+
+        this.registerUser(body)
+        .then(() => this.initialState())
+        .catch(() => this.initialState());
+      }
+ 
+    },
+
+  },
+  computed: mapGetters(['getError', 'getMessage']),
+  created(){
+    this.$store.commit('clearMessages');
+  }
     
 };
 

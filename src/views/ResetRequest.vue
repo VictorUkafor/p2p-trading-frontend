@@ -27,13 +27,13 @@
                   @submit.prevent="processForm">
 
                   <div 
-                    v-if="message" 
+                    v-if="getMessage" 
                     class="alert alert-success" 
-                    role="alert">{{ message }}</div>
+                    role="alert">{{ getMessage }}</div>
                   <div 
-                    v-if="error" 
+                    v-if="getError || error" 
                     class="alert alert-danger" 
-                    role="alert">{{ error }}</div>
+                    role="alert">{{ getError || error }}</div>
                                 
                   <div class="form-group input-group-alternative">
                     <div class="input-group-prepend">
@@ -78,61 +78,58 @@
 </template>
 <script>
 import axios from 'axios';
+import { mapGetters, mapActions } from 'vuex';
 import { validateEmail } from '../lib/validations';
 
-const api = process.env.VUE_APP_BACKEND_API;
 
 export default {
   data() {
     return {
-        email: '',
-        error: '',
-        message: '',
-        isValid: false,
-        loading: false,
+      email: '',
+      error: '',
+      isValid: false,
+      loading: false,
     };
   },
+  created() {
+    this.$store.commit('clearMessages');
+  },
   methods: {
-        emailValidate() {
-            this.message = '';
-            this.error = '';
-            const { error, isValid } = validateEmail(this.email);
-            this.error = error;
-            this.isValid = isValid;
-        },
-        submit() {
-            this.loading = true;
-            const body = { email: this.email.trim() };
-
-            axios.post(`${api}/auth/password-reset/request`,
-            body).then(res => {
-                this.loading = false;
-                this.email = '';
-                this.isValid = false;
-                this.message = res.data.successMessage;
-            }).catch(e => {
-                this.loading = false;
-                this.isValid = false;
-                this.error = e.response.data.errorMessage ||
-                e.response.data.errors.email[0] || 
-                'Your request could not be process at this time, please try again later';
-            });
-        },
-        processForm() {
-            let status = true;
-
-            if(status){
-                this.emailValidate();
-                status = this.isValid;
-            }
-            
-            if(status){
-                this.submit();
-            }
- 
-        },
-
+    ...mapActions(['resetRequest']),
+    emailValidate() {
+      this.$store.commit('clearMessages');
+      const { error, isValid } = validateEmail(this.email);
+      this.error = error;
+      this.isValid = isValid;
     },
+    initialState(){
+      this.loading = false;
+      this.email = '';
+      this.error = '';
+      this.isValid = false;
+    },
+    processForm() {
+      let status = true;
+
+      if(status){
+        this.emailValidate();
+        status = this.isValid;
+      }
+            
+      if(status){
+        this.loading = true;
+        const body = { email: this.email.trim() };
+
+        this.resetRequest(body)
+        .then(() => this.initialState())
+        .catch(() => this.initialState());
+      }
+ 
+    },
+  },
+  computed: mapGetters([
+    'getError', 'getMessage'
+  ]),
     
 };
 

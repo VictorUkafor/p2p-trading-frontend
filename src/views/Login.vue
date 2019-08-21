@@ -129,7 +129,6 @@ import axios from 'axios';
 import { mapGetters, mapActions } from 'vuex';
 import { validateEmail, validateName } from '../lib/validations';
 
-const api = process.env.VUE_APP_BACKEND_API;
 
 export default {
   data() {
@@ -147,18 +146,18 @@ export default {
   methods: {
     ...mapActions(['loginUser']),
     emailValidate() {
-      this.errorMessage = '';
-      this.successMessage = '';
+      this.$store.commit('clearMessages');
       const { error, isValid } = validateEmail(this.email);
       this.errors.email = error;
       this.isValid = isValid;
     },
     passwordValidate() {
+      this.$store.commit('clearMessages');
       const { error, isValid } = validateName(this.password, 'password');
       this.errors.password = error;
       this.isValid = isValid;
     },
-    setState(){
+    initialState(){
       this.email = '';
       this.password = '';
       this.loading = false;
@@ -167,20 +166,6 @@ export default {
         email: '',
         password: '',
       };
-    },
-    submit() {
-      this.loading = true;
-
-      const body = {
-        email: this.email.trim(),
-        password: this.password.trim()
-      }
-
-      this.loginUser(body)
-      .then(() => {
-        this.setState();
-      });
-
     },
     processForm() {
       let status = true;
@@ -196,7 +181,16 @@ export default {
       }
             
       if(status){
-        this.submit();
+      this.loading = true;
+
+      const body = {
+        email: this.email.trim(),
+        password: this.password.trim()
+      }
+
+      this.loginUser(body)
+      .then(() => this.initialState())
+      .catch(() => this.initialState());
       }
  
     },
@@ -206,6 +200,9 @@ export default {
     
   },
   computed: mapGetters(['getError']),
+  created(){
+    this.$store.commit('clearMessages');
+  }
 
     
 };
