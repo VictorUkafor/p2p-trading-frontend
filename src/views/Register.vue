@@ -34,6 +34,7 @@
                     v-if="error || getError" 
                     class="alert alert-danger" 
                     role="alert">{{ error || getError }}</div>
+                    
                   <div class="form-group input-group-alternative">
                     <div class="input-group-prepend">
                       <span class="input-group-text">

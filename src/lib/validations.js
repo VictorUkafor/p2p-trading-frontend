@@ -143,3 +143,35 @@ export const validatePassConf = (password, passConf) => {
     }
 
 }
+
+
+export const validateNumber = (bvn, name, length) => {
+    if(!bvn.trim().length){
+        return {
+            error: `Your ${name} is required`,
+            isValid: false
+        }
+    }
+
+    if(!/^[0-9]+$/.test(bvn.trim())){
+        return {
+            error: `Your ${name} must contain numbers only`,
+            isValid: false
+        }
+    }
+    
+    if(bvn.trim().length !== length){
+        return {
+            error: `Your ${name} must be ${length} characters long`,
+            isValid: false
+        }
+    }
+
+
+
+    return {
+        isValid: true,
+        error: '',
+    }
+
+}

@@ -21,16 +21,12 @@
                 <div class="text-center text-muted mb-4">
                   <small>Please enter your email and password to login</small>
                 </div>
+                
                 <form 
                   role="form" 
                   method="post" 
                   @submit.prevent="processForm">
 
-                  <!-- <div 
-                    v-if="successMessage" 
-                    class="alert alert-success" 
-                    role="alert">{{ successMessage }}
-                  </div> -->
                   <div 
                     v-if="getError" 
                     class="alert alert-danger" 

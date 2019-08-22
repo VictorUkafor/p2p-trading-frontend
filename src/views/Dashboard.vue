@@ -12,7 +12,7 @@
     </div>
 
 
-    <div class="container pt-lg-md">
+    <div v-if="!getUser.bvn || !getUser.bvn.verified" class="container pt-lg-md">
       <div class="row justify-content-center">
         <div class="col-lg-8">
 
@@ -22,9 +22,7 @@
                 <div class="text mb-10">
                   <p><strong>You need to verify your identity.</strong> 
                     Visit the <strong>"Verify Identity"</strong> page and follow the instructions. </p>
-                    <router-link to="#">
-                    <button class="btn btn-default mb-sm-0">Verify Your Identity</button>
-                  </router-link>
+                    <button @click="verifyId" class="btn btn-default mb-sm-0">Verify Your Identity</button>
                 </div>
             
             </div>
@@ -237,6 +235,7 @@
   </section>
 </template>
 <script>
+import { mapGetters, mapActions } from 'vuex';
 
 
 export default {
@@ -246,8 +245,17 @@ export default {
 
     };
   },
+  methods: {
+    ...mapActions(['getProfile']),
+    verifyId(){
+      this.$store.commit('setPage', 'verify-identity');
+      this.$router.push('/verify-identity');
+    },
+  },
+  computed: mapGetters(['getError', 'getUser']),
   created(){
     this.$store.commit('setPage', 'dashboard');
+    this.getProfile();
   }
     
 };

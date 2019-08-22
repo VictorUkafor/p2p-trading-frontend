@@ -4,12 +4,13 @@ import router from '../../router'
 const api = process.env.VUE_APP_BACKEND_API;
 
 const state = {
-    auth: false,
+    auth: localStorage.getItem('auth') || false,
     successMessage: '',
     errorMessage: '',
     page: '',
     resetToken: false,
     activationToken: false,
+    authToken: localStorage.getItem('token') || null,
 };
 
 const getters = {
@@ -19,6 +20,7 @@ const getters = {
     getPage: state => state.page,
     getResetToken: state => state.resetToken,
     getActToken: state => state.activationToken,
+    getAuthToken: state => state.authToken,
 };
 
 const mutations = {
@@ -32,6 +34,7 @@ const mutations = {
     setPage: (state, page) => (state.page = page),
     setResetToken: (state, token) => (state.resetToken = token),
     setActToken: (state, token) => (state.activationToken = token),
+    setAuthToken: (state, token) => (state.authToken = token),
 };
 
 const actions = {
@@ -100,7 +103,9 @@ const actions = {
             const res = await axios.post(`${api}/auth/login`, body);
             commit('setAuth', true);
             commit('setPage', 'dashboard');
+            commit('setAuthToken', res.data.token);
             localStorage.setItem('token', res.data.token);
+            localStorage.setItem('auth', true);
             router.push('/dashboard');
         } catch(e){
             commit('setAuth', false);
@@ -110,7 +115,7 @@ const actions = {
         }
     },
     logOut({ commit }){
-        localStorage.removeItem('token');
+        localStorage.clear();
         commit('setAuth', false);
         router.push('/login');
     }

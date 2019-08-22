@@ -7,7 +7,7 @@ import Login from '../views/Login';
 import ResetRequest from '../views/ResetRequest';
 import ResetPassword from '../views/ResetPassword';
 import Dashboard from '../views/Dashboard';
-
+import VerifyIdentity from '../views/VerifyIdentity';
 
 export default [
   {
@@ -19,7 +19,8 @@ export default [
       footer: AppFooter
     },
     meta: {
-      title: 'Get Started - P2P Trading',
+      title: 'Get Started | P2P Trading',
+      requiresVisitor: true,
     },
   },
   {
@@ -31,7 +32,8 @@ export default [
       footer: AppFooter
     },
     meta: {
-      title: 'Register - P2P Trading',
+      title: 'Register | P2P Trading',
+      requiresVisitor: true,
     }
   },
   {
@@ -43,7 +45,8 @@ export default [
       footer: AppFooter
     },
     meta: {
-      title: 'Account Activation - P2P Trading',
+      title: 'Account Activation | P2P Trading',
+      requiresVisitor: true,
     }
   },
   {
@@ -56,6 +59,7 @@ export default [
     },
     meta: {
       title: 'Login - P2P Trading',
+      requiresVisitor: true,
     } 
   },
   {
@@ -67,7 +71,8 @@ export default [
       footer: AppFooter
     },
     meta: {
-      title: 'Password Reset Request - P2P Trading',
+      title: 'Password Reset Request | P2P Trading',
+      requiresVisitor: true,
     },
   },
   {
@@ -79,7 +84,8 @@ export default [
       footer: AppFooter
     },
     meta: {
-      title: 'Password Reset Process - P2P Trading',
+      title: 'Password Reset Process | P2P Trading',
+      requiresVisitor: true,
     },
   },
   {
@@ -91,7 +97,21 @@ export default [
       footer: AppFooter
     },
     meta: {
-      title: 'Dashboard - P2P Trading',
+      title: 'Dashboard | P2P Trading',
+      requiresAuth: true,
+    },
+  },
+  {
+    path: '/verify-identity',
+    name: 'verify-identity',
+    components: {
+      header: AppHeader,
+      default: VerifyIdentity,
+      footer: AppFooter
+    },
+    meta: {
+      title: 'Verify | P2P Trading',
+      requiresAuth: true,
     },
   }
 ];

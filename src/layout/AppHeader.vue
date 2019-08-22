@@ -49,13 +49,14 @@
                     <router-link to="#" class="dropdown-item">Send & Recieve Coins</router-link>
                     <router-link to="#" class="dropdown-item">My Wallet</router-link>
                 </base-dropdown>
-                <base-dropdown tag="li" class="nav-item">
+                <base-dropdown tag="li" class="nav-item" :class="accountActive ? 'active': ''">
                     <a slot="title" href="#" class="nav-link" data-toggle="dropdown" role="button">
                         <i class="ni ni-single-02"></i>
                         <span class="nav-link-inner--text">Account</span>
                     </a>
                     <router-link to="#" class="dropdown-item">Edit Profile</router-link>
-                    <router-link to="#" class="dropdown-item">Verify Identity</router-link>
+                    <li @click="verifyId" class="dropdown-item" 
+                    :class="getPage === 'verify-identity' ? 'active': ''">Verify Identity</li>
                     <router-link to="#" class="dropdown-item">Bank Accounts and Cards</router-link>
                     <router-link to="#" class="dropdown-item">Security and Settings</router-link>
                 </base-dropdown>
@@ -104,11 +105,20 @@ export default {
     landingPage(event){
       this.$store.commit('setPage', 'landing');
       this.$router.push('/landing');
-    }
-  
+    },
+    verifyId(){
+      this.$store.commit('setPage', 'verify-identity');
+      this.$router.push('/verify-identity');
+    },
 
   },
-  computed: mapGetters(['getAuth', 'getPage']),
+  computed: {
+    ...mapGetters(['getAuth', 'getPage']),
+    accountActive(){
+      if(this.getPage === 'verify-identity')
+      return true;
+    }
+  },
   
 };
 </script>
