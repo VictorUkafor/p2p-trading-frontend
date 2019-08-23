@@ -8,6 +8,7 @@ import ResetRequest from '../views/ResetRequest';
 import ResetPassword from '../views/ResetPassword';
 import Dashboard from '../views/Dashboard';
 import VerifyIdentity from '../views/VerifyIdentity';
+import EditProfile from '../views/EditProfile';
 
 export default [
   {
@@ -110,7 +111,20 @@ export default [
       footer: AppFooter
     },
     meta: {
-      title: 'Verify | P2P Trading',
+      title: 'Verify Identity | P2P Trading',
+      requiresAuth: true,
+    },
+  },
+  {
+    path: '/edit-profile',
+    name: 'edit-profile',
+    components: {
+      header: AppHeader,
+      default: EditProfile,
+      footer: AppFooter
+    },
+    meta: {
+      title: 'Edit Profile | P2P Trading',
       requiresAuth: true,
     },
   }

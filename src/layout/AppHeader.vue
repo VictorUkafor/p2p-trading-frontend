@@ -11,18 +11,19 @@
         class="navbar-brand mr-lg-5" 
         to="/">
         <img 
-        @click="landingPage"
           src="../assets/img/brand/white.png" 
           alt="logo">
       </router-link>
 
       <ul v-if="getAuth" class="navbar-nav navbar-nav-hover align-items-lg-center">
-        <li class="nav-item" :class="getPage === 'dashboard' ? 'active': ''">
-                    <a href="/dashboard" class="nav-link">
-                        <i class="ni ni-collection"></i>
-                        <span class="nav-link-inner--text">Dashboard</span>
-                    </a>
-                </li>
+        <router-link to="/dashboard">
+        <li class="nav-item" :class="$route.name === 'dashboard' ? 'active': ''">
+          <a href="/dashboard" class="nav-link">
+            <i class="ni ni-collection"></i>
+              <span class="nav-link-inner--text">Dashboard</span>
+          </a>
+        </li>
+        </router-link>
                 <base-dropdown tag="li" class="nav-item">
                     <a slot="title" href="#" class="nav-link" data-toggle="dropdown" role="button">
                         <i class="ni ni-cart"></i>
@@ -54,21 +55,24 @@
                         <i class="ni ni-single-02"></i>
                         <span class="nav-link-inner--text">Account</span>
                     </a>
-                    <router-link to="#" class="dropdown-item">Edit Profile</router-link>
-                    <li @click="verifyId" class="dropdown-item" 
-                    :class="getPage === 'verify-identity' ? 'active': ''">Verify Identity</li>
+                    <router-link to="/edit-profile" class="dropdown-item"
+                    :class="$route.name === 'edit-profile' ? 'active': ''">Edit Profile</router-link>
+                    <router-link to="/verify-identity" class="dropdown-item" 
+                    :class="$route.name === 'verify-identity' ? 'active': ''">Verify Identity</router-link>
                     <router-link to="#" class="dropdown-item">Bank Accounts and Cards</router-link>
                     <router-link to="#" class="dropdown-item">Security and Settings</router-link>
                 </base-dropdown>
       </ul>
 
       <ul class="navbar-nav align-items-lg-center ml-lg-auto">
-        <li v-if="!getAuth && getPage !== 'login'" @click="logIn" class="btn btn-neutral">
+        <router-link to="/login">
+        <li v-if="$route.name !== 'login' && !getAuth" class="btn btn-neutral">
             <span class="btn-inner--icon">
               <i class="fa fa-sign-in mr-2"/>
             </span>
             <span class="nav-link-inner--text">Login</span>
           </li>
+        </router-link>
           <li v-if="getAuth" @click="logout" class="btn btn-neutral">
             <span class="btn-inner--icon">
               <i class="fa fa-sign-out mr-2"/>
@@ -94,28 +98,16 @@ export default {
   },
   methods: {
     ...mapActions(['logOut']),
-    logIn(event){
-      this.$store.commit('setPage', 'login');
-      this.$router.push('/login');
-    },
     logout(event){
-      this.$store.commit('setPage', 'login');
-      this.logOut();
+      this.logOut()
+      .then(() => this.$router.go('/login'));
     },
-    landingPage(event){
-      this.$store.commit('setPage', 'landing');
-      this.$router.push('/landing');
-    },
-    verifyId(){
-      this.$store.commit('setPage', 'verify-identity');
-      this.$router.push('/verify-identity');
-    },
-
   },
   computed: {
-    ...mapGetters(['getAuth', 'getPage']),
+    ...mapGetters(['getAuth', 'getUser']),
     accountActive(){
-      if(this.getPage === 'verify-identity')
+      if(this.$route.name === 'verify-identity' || 
+      this.$route.name === 'edit-profile')
       return true;
     }
   },

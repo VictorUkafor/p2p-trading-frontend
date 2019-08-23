@@ -37,13 +37,20 @@ export const validateTerm = (term) => {
 }
 
 
-export const validateName = (name, field) => {
-    if(!name.trim().length){
+export const validateName = (name, field, required = true) => {
+    if(!name.trim().length && required){
         return {
             error: `Your ${field} is required`,
             isValid: false
         }
     }
+
+    if (name.trim() && (/\s/.test(name.trim()))) {
+        return {
+          error: `Your ${name} should not contain spaces`,
+          status: false,
+        };
+      }
 
     return {
         isValid: true,
@@ -53,16 +60,16 @@ export const validateName = (name, field) => {
 }
 
 
-export const validateDate = (date) => {
+export const validateDate = (date, required = true) => {
     const dateFormat = /^(0?[1-9]|[12][0-9]|3[01])[/](0?[1-9]|1[012])[/]\d{4}$/;
-    if(!date.trim().length){
+    if(!date.trim().length && required){
         return {
             error: 'Your date of birth is required',
             isValid: false
         }
     }
 
-    if(!dateFormat.test(date.trim())){
+    if(date.trim().length && !dateFormat.test(date.trim())){
         return {
             error: 'Your date of birth must be valid',
             isValid: false
@@ -88,7 +95,7 @@ export const validatePassword = (password) => {
 
     if (/\s/.test(password.trim())) {
         return {
-          message: 'Your password should not contain spaces',
+          error: 'Your password should not contain spaces',
           status: false,
         };
       }

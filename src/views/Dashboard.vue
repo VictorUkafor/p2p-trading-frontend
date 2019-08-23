@@ -22,7 +22,10 @@
                 <div class="text mb-10">
                   <p><strong>You need to verify your identity.</strong> 
                     Visit the <strong>"Verify Identity"</strong> page and follow the instructions. </p>
-                    <button @click="verifyId" class="btn btn-default mb-sm-0">Verify Your Identity</button>
+
+                    <router-link to="/verify-identity">
+                    <button class="btn btn-default mb-sm-0">Verify Your Identity</button>
+                    </router-link>
                 </div>
             
             </div>
@@ -247,14 +250,9 @@ export default {
   },
   methods: {
     ...mapActions(['getProfile']),
-    verifyId(){
-      this.$store.commit('setPage', 'verify-identity');
-      this.$router.push('/verify-identity');
-    },
   },
   computed: mapGetters(['getError', 'getUser']),
   created(){
-    this.$store.commit('setPage', 'dashboard');
     this.getProfile();
   }
     

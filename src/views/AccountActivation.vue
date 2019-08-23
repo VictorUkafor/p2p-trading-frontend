@@ -95,7 +95,7 @@
                     <div class="input-group-prepend">
                       <span class="input-group-text">
                         <slot name="addonLeft">
-                          <i class="ni ni-calender-grid-58"/>
+                          <i class="ni ni-calendar-grid-58"/>
                         </slot>
                       </span>
                       <input 
@@ -276,7 +276,6 @@ export default {
     formatDOB(date){
       const split = date.split('/');
       return `${split[2]}-${split[1]}-${split[0]}`;
-
     },
     processForm() {
       let status = true;

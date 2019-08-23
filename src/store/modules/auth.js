@@ -1,5 +1,4 @@
 import axios from 'axios';
-import router from '../../router'
 
 const api = process.env.VUE_APP_BACKEND_API;
 
@@ -7,7 +6,6 @@ const state = {
     auth: localStorage.getItem('auth') || false,
     successMessage: '',
     errorMessage: '',
-    page: '',
     resetToken: false,
     activationToken: false,
     authToken: localStorage.getItem('token') || null,
@@ -17,7 +15,6 @@ const getters = {
     getAuth: state => state.auth,
     getMessage: state => state.successMessage,
     getError: state => state.errorMessage,
-    getPage: state => state.page,
     getResetToken: state => state.resetToken,
     getActToken: state => state.activationToken,
     getAuthToken: state => state.authToken,
@@ -31,7 +28,6 @@ const mutations = {
         state.errorMessage = '';
         state.successMessage = '';
     },
-    setPage: (state, page) => (state.page = page),
     setResetToken: (state, token) => (state.resetToken = token),
     setActToken: (state, token) => (state.activationToken = token),
     setAuthToken: (state, token) => (state.authToken = token),
@@ -102,11 +98,9 @@ const actions = {
         try{
             const res = await axios.post(`${api}/auth/login`, body);
             commit('setAuth', true);
-            commit('setPage', 'dashboard');
             commit('setAuthToken', res.data.token);
             localStorage.setItem('token', res.data.token);
             localStorage.setItem('auth', true);
-            router.push('/dashboard');
         } catch(e){
             commit('setAuth', false);
             commit('setError', e.response.data.errorMessage || 
@@ -117,7 +111,6 @@ const actions = {
     logOut({ commit }){
         localStorage.clear();
         commit('setAuth', false);
-        router.push('/login');
     }
 };
 

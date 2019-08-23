@@ -80,6 +80,8 @@
                     v-if="errors.password" 
                     class="alert alert-danger" 
                     role="alert">{{ errors.password }}</div>
+
+                    
                   <div class="text-center">
                                     
                     <button 
@@ -185,7 +187,7 @@ export default {
       }
 
       this.loginUser(body)
-      .then(() => this.initialState())
+      .then(() => this.$router.go('/dashboard'))
       .catch(() => this.initialState());
       }
  
