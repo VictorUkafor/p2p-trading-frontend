@@ -107,7 +107,7 @@
                   </p>
                 </div>
 
-                <div class="text mb-10">
+                <div v-if="!bvn.verified" class="text mb-10">
                   <p><strong>You need to verify your identity.</strong> 
                     Visit the <strong>"Verify Identity"</strong> page and follow the instructions. </p>
 
