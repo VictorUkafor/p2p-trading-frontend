@@ -59,7 +59,8 @@
                     :class="$route.name === 'edit-profile' ? 'active': ''">Edit Profile</router-link>
                     <router-link to="/verify-identity" class="dropdown-item" 
                     :class="$route.name === 'verify-identity' ? 'active': ''">Verify Identity</router-link>
-                    <router-link to="#" class="dropdown-item">Bank Accounts and Cards</router-link>
+                    <router-link to="/bank-accounts" class="dropdown-item"
+                    :class="$route.name === 'bank-accounts' ? 'active': ''">Bank Accounts and Cards</router-link>
                     <router-link to="#" class="dropdown-item">Security and Settings</router-link>
                 </base-dropdown>
       </ul>
@@ -99,6 +100,7 @@ export default {
   methods: {
     ...mapActions(['logOut']),
     logout(event){
+      localStorage.clear();
       this.logOut()
       .then(() => this.$router.go('/login'));
     },
@@ -107,7 +109,8 @@ export default {
     ...mapGetters(['getAuth', 'getUser']),
     accountActive(){
       if(this.$route.name === 'verify-identity' || 
-      this.$route.name === 'edit-profile')
+      this.$route.name === 'edit-profile' ||
+      this.$route.name === 'bank-accounts')
       return true;
     }
   },

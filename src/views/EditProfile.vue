@@ -131,8 +131,13 @@
 
                   <div class="text-center" >
                                     
-                    <button v-if="loading" disabled 
-                      class="btn btn-neutral my-4">Loading . . .</button>
+                    <button 
+                      v-if="loading" 
+                      disabled 
+                      class="btn btn-neutral my-4">
+                      <span class="spinner-border spinner-border-sm" 
+                      role="status" aria-hidden="true"></span>
+                      Loading . . .</button>
 
                       <button v-if="!loading" :disabled="!isValid" 
                       class="btn btn-default my-4">Update Profile</button>
@@ -236,10 +241,6 @@ export default {
         status = this.isValid;
       }
             
-      if(status){
-      this.loading = true;
-      }
-
       const body = {
         first_name: this.firstName.trim(),
         last_name: this.lastName.trim(),

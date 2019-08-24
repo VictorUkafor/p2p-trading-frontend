@@ -174,7 +174,12 @@
                     <button 
                       v-if="loading" 
                       disabled 
-                      class="btn btn-neutral my-4">Loading . . .</button>
+                      class="btn btn-neutral my-4">
+                      <span class="spinner-border spinner-border-sm" 
+                      role="status" aria-hidden="true"></span>
+                      Loading . . .</button>
+
+
                     <button 
                       v-if="!loading && getActToken" 
                       :disabled="noErrors()" 

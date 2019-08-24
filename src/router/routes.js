@@ -9,6 +9,7 @@ import ResetPassword from '../views/ResetPassword';
 import Dashboard from '../views/Dashboard';
 import VerifyIdentity from '../views/VerifyIdentity';
 import EditProfile from '../views/EditProfile';
+import BankAccount from '../views/BankAccount';
 
 export default [
   {
@@ -125,6 +126,19 @@ export default [
     },
     meta: {
       title: 'Edit Profile | P2P Trading',
+      requiresAuth: true,
+    },
+  },
+  {
+    path: '/bank-accounts',
+    name: 'bank-accounts',
+    components: {
+      header: AppHeader,
+      default: BankAccount,
+      footer: AppFooter
+    },
+    meta: {
+      title: 'Bank Account | P2P Trading',
       requiresAuth: true,
     },
   }
