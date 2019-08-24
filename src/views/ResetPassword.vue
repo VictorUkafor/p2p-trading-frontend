@@ -126,7 +126,6 @@ import {
     validatePassConf,
   } from '../lib/validations';
 
-const api = process.env.VUE_APP_BACKEND_API;
 
 export default {
   data() {
@@ -141,11 +140,8 @@ export default {
         loading: false,
     };
   },
-  created() {
-    this.setResetToken(this.$route.params.token);
-  },
   methods: {
-    ...mapActions(['setResetToken', 'resetPassword']),
+    ...mapActions(['findResetToken', 'resetPassword']),
     passwordValidate() {
       this.$store.commit('clearMessages');
       const { error, isValid } = validatePassword(this.password);
@@ -187,10 +183,11 @@ export default {
 
         const body = {
           password: this.password.trim(),
-          password_confirmation: this.passwordConfirmation.trim()
+          password_confirmation: this.passwordConfirmation.trim(),
+          token: this.$route.params.token,
         }
 
-        this.resetPassword(body, this.$route.params.token)
+        this.resetPassword(body)
         .then(() => this.initialState())
         .catch(() => this.initialState());
       }
@@ -206,6 +203,9 @@ export default {
   computed: mapGetters([
     'getError', 'getMessage', 'getResetToken'
   ]),
+  created() {
+    this.findResetToken(this.$route.params.token);
+  },
   
 };
 

@@ -223,7 +223,6 @@ export default {
       return `${split[2]}-${split[1]}-${split[0]}`;
     },
     processForm(){
-      this.loading = true;
       let status = true;
 
       if(status){
@@ -250,7 +249,8 @@ export default {
       }
 
 
-      if(status){      
+      if(status){  
+        this.loading = true;    
         this.updateProfile(body)
         .then(() => this.initialState())
         .catch(() => this.initialState());

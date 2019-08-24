@@ -32,8 +32,6 @@ const actions = {
             return res;
         } catch(e){
             commit('setAuth', false);
-            commit('setError', e.response.data.errorMessage || 
-            'Your request could not be process at this time, please try again later');
             console.log('wwwww', e.response.data);
         }
     },

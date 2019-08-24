@@ -11,7 +11,7 @@
           <div class="card bg-secondary shadow">
             <div class="card-body px-lg-5 py-lg-5">
 
-                <div v-if="!getUser.bvn.verified" class="text-center mb-10">
+                <div v-if="!bvnNumber.verified" class="text-center mb-10">
                   <h5><strong>Verify Identity</strong></h5>
                   <div v-if="getUser.bvn && !bvnNumber.verified && !otpSent" 
                   class="text-center text-muted mb-4">
@@ -338,7 +338,6 @@ export default {
       verified: false,
       bvn_number: '',
       };  
-      console.log('get profile', res, 'page', this.$route.name);
     });
   }
     

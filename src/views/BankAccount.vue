@@ -16,7 +16,7 @@
                   <hr/>
         
                 <form 
-                  v-if="getUser.bvn.verified"
+                  v-if="bvn.verified"
                   role="form" 
                   method="post"
                   @submit.prevent="processForm">
@@ -86,7 +86,6 @@
                   </div>
                 </form>
                 
-
                 <div class="text-left" v-for="account in accounts" :key="account.id">
                   <hr/>
 
@@ -108,7 +107,14 @@
                   </p>
                 </div>
 
-                                  
+                <div class="text mb-10">
+                  <p><strong>You need to verify your identity.</strong> 
+                    Visit the <strong>"Verify Identity"</strong> page and follow the instructions. </p>
+
+                    <router-link to="/verify-identity">
+                    <button class="btn btn-default mb-sm-0">Verify Your Identity</button>
+                    </router-link>
+                </div>         
 
                 </div>
 
@@ -141,6 +147,9 @@ export default {
       errors: {
         accountNumber: '',
         internetBanking: '',
+      },
+      bvn: {
+        verified: false,
       },
       accounts: {},
       selected: 0,
@@ -190,7 +199,6 @@ export default {
       }
     },
     processForm(){
-      this.loading = true;
       let status = true;
 
       if(status){
@@ -204,7 +212,8 @@ export default {
       }
 
 
-      if(status){      
+      if(status){  
+        this.loading = false;    
         this.addAccount(body)
         .then(() => {
           this.initialState();
@@ -219,10 +228,12 @@ export default {
     ...mapGetters(['getError', 'getMessage', 'getUser']),
   },
   created(){
-    this.getProfile()
-    .then((res) => this.accounts = 
-    res.data.user.bankAccounts ? 
-    res.data.user.bankAccounts : {} );
+    this.getProfile().then((res) => {
+      this.accounts = res.data.user.bankAccounts ? 
+      res.data.user.bankAccounts : {};
+      this.bvn = res.data.user.bvn ? 
+      res.data.user.bvn : {}
+    });
     
   }
     

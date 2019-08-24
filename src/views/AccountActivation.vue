@@ -10,6 +10,7 @@
       <span/>
       <span/>
     </div>
+    
     <div class="container pt-lg-md">
       <div class="row justify-content-center">
         <div class="col-lg-5">
@@ -226,9 +227,6 @@ export default {
       loading: false,
     };
   },
-  created() {
-    findActivationToken(this.$route.params.token);
-  },
   methods: {
     ...mapActions(['activateAccount', 'findActivationToken']),
     firstNameValidate() {
@@ -318,10 +316,11 @@ export default {
           last_name: this.lastName.trim(),
           date_of_birth: this.formatDOB(this.dateOfBirth.trim()),
           password: this.password.trim(),
-          password_confirmation: this.passwordConfirmation.trim()
+          password_confirmation: this.passwordConfirmation.trim(),
+          token: this.$route.params.token,
         }
         
-        activateAccount(body, token)
+        this.activateAccount(body)
         .then(() => this.initialState())
         .catch(() => this.initialState());
       }
@@ -336,6 +335,10 @@ export default {
   computed: mapGetters([
     'getError', 'getMessage', 'getActToken'
   ]),
+  created() {
+    this.findActivationToken(this.$route.params.token);
+    console.log(this.$route.params.token, 'tttttt', 'getActToken', this.getActToken);
+  },
     
 };
 

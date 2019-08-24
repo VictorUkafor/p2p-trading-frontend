@@ -102,7 +102,7 @@
                 <div class="row mt-3">
                   <div class="col-6">
                     <a 
-                      href="/password-reset/request" 
+                      href="/forgot-password" 
                       class="text-light">
                       <small>Forgot password?</small>
                     </a>
@@ -191,7 +191,10 @@ export default {
       }
 
       this.loginUser(body)
-      .then(() => this.$router.go('/dashboard'))
+      .then(() => {
+        this.initialState();
+        this.$router.go('/dashboard');
+        })
       .catch(() => this.initialState());
       }
  

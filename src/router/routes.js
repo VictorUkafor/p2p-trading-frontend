@@ -4,7 +4,7 @@ import Landing from '../views/Landing';
 import Register from '../views/Register';
 import AccountActivation from '../views/AccountActivation';
 import Login from '../views/Login';
-import ResetRequest from '../views/ResetRequest';
+import ForgotPassword from '../views/ForgotPassword';
 import ResetPassword from '../views/ResetPassword';
 import Dashboard from '../views/Dashboard';
 import VerifyIdentity from '../views/VerifyIdentity';
@@ -65,11 +65,11 @@ export default [
     } 
   },
   {
-    path: '/password-reset/request',
-    name: 'reset-request',
+    path: '/forgot-password',
+    name: 'forgot-password',
     components: {
       header: AppHeader,
-      default: ResetRequest,
+      default: ForgotPassword,
       footer: AppFooter
     },
     meta: {

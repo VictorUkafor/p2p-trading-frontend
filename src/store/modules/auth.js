@@ -6,8 +6,8 @@ const state = {
     auth: localStorage.getItem('auth') || false,
     successMessage: '',
     errorMessage: '',
-    resetToken: false,
-    activationToken: false,
+    resetToken: localStorage.getItem('resetToken') || false,
+    activationToken: localStorage.getItem('activationToken') || false,
     authToken: localStorage.getItem('token') || null,
 };
 
@@ -34,10 +34,11 @@ const mutations = {
 };
 
 const actions = {
-    async activateAccount({ commit }, body, token) {
+    async activateAccount({ commit }, body) {
         try{
-            const res = await axios.post(`${api}/auth/account-activation/${token}`, body);
+            const res = await axios.post(`${api}/auth/account-activation/${body.token}`, body);
             commit('setMessage', res.data.successMessage);
+            localStorage.removeItem('activationToken');
         } catch(e){
             commit('setError', e.response.data.errorMessage || 
             e.response.data.errors || 
@@ -58,6 +59,7 @@ const actions = {
         try{
             await axios.get(`${api}/auth/password-reset/find/${token}`);
             commit('setResetToken', true);
+            localStorage.setItem('resetToken', true);
         } catch(e){
             commit('setError', e.response.data.errorMessage || 
             e.response.data.errors.email[0] || 
@@ -68,16 +70,19 @@ const actions = {
         try{
             await axios.get(`${api}/auth/find-token/${token}`);
             commit('setActToken', true);
+            localStorage.setItem('activationToken', true);
+            console.log('codecccc', token);
         } catch(e){
             commit('setError', e.response.data.errorMessage || 
             e.response.data.errors.email[0] || 
             'Your request could not be process at this time, please try again later');
         }
     },
-    async resetPassword({ commit }, body, token) {
+    async resetPassword({ commit }, body) {
         try{
-            const res = await axios.post(`${api}/auth/password-reset/reset/${token}`, body);
+            const res = await axios.post(`${api}/auth/password-reset/reset/${body.token}`, body);
             commit('setMessage', res.data.successMessage);
+            localStorage.removeItem('resetToken');
         } catch(e){
             commit('setError', e.response.data.errorMessage || 
             e.response.data.errors || 

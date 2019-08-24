@@ -80,8 +80,7 @@
                       disabled 
                       class="btn btn-neutral my-4">
                       <span class="spinner-border spinner-border-sm" 
-                      role="status" aria-hidden="true"></span>
-                      Loading . . .</button>
+                      role="status" aria-hidden="true"></span> Loading . . .</button>
 
 
                     <button 
