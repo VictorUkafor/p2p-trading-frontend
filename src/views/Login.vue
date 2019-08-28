@@ -194,8 +194,7 @@ export default {
       .then(() => {
         this.initialState();
         this.$router.go('/dashboard');
-        })
-      .catch(() => this.initialState());
+        });
       }
  
     },

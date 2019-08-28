@@ -15,7 +15,8 @@
           alt="logo">
       </router-link>
 
-      <ul v-if="getAuth" class="navbar-nav navbar-nav-hover align-items-lg-center">
+      <ul v-if="getAuth && $route.name !== 'mail-us'" 
+      class="navbar-nav navbar-nav-hover align-items-lg-center">
         <router-link to="/dashboard">
         <li class="nav-item" :class="$route.name === 'dashboard' ? 'active': ''">
           <a href="/dashboard" class="nav-link">
@@ -61,11 +62,12 @@
                     :class="$route.name === 'verify-identity' ? 'active': ''">Verify Identity</router-link>
                     <router-link to="/bank-accounts" class="dropdown-item"
                     :class="$route.name === 'bank-accounts' ? 'active': ''">Bank Accounts and Cards</router-link>
-                    <router-link to="#" class="dropdown-item">Security and Settings</router-link>
+                    <router-link to="/security-and-settings" class="dropdown-item" 
+                    :class="$route.name === 'setings' ? 'active': ''">Security and Settings</router-link>
                 </base-dropdown>
       </ul>
 
-      <ul class="navbar-nav align-items-lg-center ml-lg-auto">
+      <ul  v-if="$route.name !== 'mail-us'" class="navbar-nav align-items-lg-center ml-lg-auto">
         <router-link to="/login">
         <li v-if="$route.name !== 'login' && !getAuth" class="btn btn-neutral">
             <span class="btn-inner--icon">
@@ -76,7 +78,7 @@
         </router-link>
           <li v-if="getAuth" @click="logout" class="btn btn-neutral">
             <span class="btn-inner--icon">
-              <i class="fa fa-sign-out mr-2"/>
+              <i class="ni ni-button-power mr-2"/>
             </span>
             <span class="nav-link-inner--text">Logout</span>
           </li>
@@ -100,7 +102,6 @@ export default {
   methods: {
     ...mapActions(['logOut']),
     logout(event){
-      localStorage.clear();
       this.logOut()
       .then(() => this.$router.go('/login'));
     },
@@ -110,7 +111,8 @@ export default {
     accountActive(){
       if(this.$route.name === 'verify-identity' || 
       this.$route.name === 'edit-profile' ||
-      this.$route.name === 'bank-accounts')
+      this.$route.name === 'bank-accounts' || 
+      this.$route.name === 'settings')
       return true;
     }
   },

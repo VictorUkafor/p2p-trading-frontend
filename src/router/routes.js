@@ -10,6 +10,9 @@ import Dashboard from '../views/Dashboard';
 import VerifyIdentity from '../views/VerifyIdentity';
 import EditProfile from '../views/EditProfile';
 import BankAccount from '../views/BankAccount';
+import Settings from '../views/Settings';
+import MailUs from '../views/MailUs';
+
 
 export default [
   {
@@ -139,6 +142,32 @@ export default [
     },
     meta: {
       title: 'Bank Account | P2P Trading',
+      requiresAuth: true,
+    },
+  },
+  {
+    path: '/security-and-settings',
+    name: 'settings',
+    components: {
+      header: AppHeader,
+      default: Settings,
+      footer: AppFooter
+    },
+    meta: {
+      title: 'Security and Settings | P2P Trading',
+      requiresAuth: true,
+    },
+  },
+  {
+    path: '/mail-us',
+    name: 'mail-us',
+    components: {
+      header: AppHeader,
+      default: MailUs,
+      footer: AppFooter
+    },
+    meta: {
+      title: 'Mail Us | P2P Trading',
       requiresAuth: true,
     },
   }
