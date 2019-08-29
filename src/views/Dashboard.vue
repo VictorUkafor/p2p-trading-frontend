@@ -12,7 +12,7 @@
     </div>
 
 
-    <div v-if="!getUser.bvn || !getUser.bvn.verified" class="container pt-lg-md">
+    <div v-if="!user.bvn.verified" class="container pt-lg-md">
       <div class="row justify-content-center">
         <div class="col-lg-8">
 
@@ -245,15 +245,32 @@ export default {
   name: "Dashboard",
   data() {
     return {
-
+      user: {
+        notifications: {},
+        bvn: {
+          
+        },
+      },
     };
   },
   methods: {
-    ...mapActions(['getProfile']),
+    ...mapActions(['getProfile', 'logOut']),
+  },
+  mounted(){
+    if(this.user.notifications.auto_logout){
+      window.onbeforeunload = (e) => {
+        this.logOut();
+      }
+    }
   },
   computed: mapGetters(['getError', 'getUser']),
   created(){
-    this.getProfile();
+    this.getProfile().then(() => {
+      this.user = this.getUser;
+      this.user.bvn = this.getUser.bvn ? this.getUser.bvn : {}
+    });
+
+    this.$store.commit('clearMessages');
   }
     
 };

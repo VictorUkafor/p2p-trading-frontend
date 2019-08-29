@@ -5,7 +5,7 @@
 
 
 
-    <div v-if="getUser.id" class="container pt-lg-md">
+    <div v-if="user.id" class="container pt-lg-md">
         <div class="row justify-content-center">
           <div class="col-lg-8">
           <div class="card bg-secondary shadow">
@@ -44,7 +44,7 @@
                         v-model="firstName"
                         class="form-control"
                         type="text"
-                        :placeholder=getUser.first_name
+                        :placeholder=user.first_name
                         name="firstName"
                         aria-describedby="addon-right addon-left"
                         @keyup="firstNameValidate()">
@@ -69,7 +69,7 @@
                         v-model="lastName"
                         class="form-control"
                         type="text"
-                        :placeholder=getUser.last_name
+                        :placeholder=user.last_name
                         name="lastName"
                         aria-describedby="addon-right addon-left"
                         @keyup="lastNameValidate()">
@@ -95,7 +95,7 @@
                         class="form-control"
                         type="text"
                         disabled
-                        :placeholder=getUser.email
+                        :placeholder=user.email
                         aria-describedby="addon-right addon-left"
                         >
                     </div>
@@ -179,6 +179,9 @@ export default {
         lastName: '',
         dateOfBirth: '',
       },
+      user: {
+        notifications: {},
+      }
     };
   },
   methods: {
@@ -190,21 +193,18 @@ export default {
       const { error, isValid } = validateName(this.firstName, 'first name', false);
       this.errors.firstName = error;
       this.isValid = isValid;
-     console.log('ddddd', this.firstName);
     },
     lastNameValidate() {
       this.$store.commit('clearMessages');
       const { error, isValid } = validateName(this.lastName, 'last name', false);
       this.errors.lastName = error;
       this.isValid = isValid;
-     console.log('ddddd', this.lastName);
     },
     dobValidate() {
       this.$store.commit('clearMessages');
       const { error, isValid } = validateDate(this.dateOfBirth, false);
       this.errors.dateOfBirth = error;
       this.isValid = isValid;
-     console.log('ddddd', this.dateOfBirth);
     },
     initialState(){
       this.firstName = '';
@@ -266,8 +266,17 @@ export default {
       return `${split[2]}/${split[1]}/${split[0]}`;
     },
   },
+  mounted(){
+    if(this.user.notifications.auto_logout){
+      window.onbeforeunload = (e) => {
+        this.logOut();
+      }
+    }
+  },
   created(){
-    this.getProfile();
+    this.getProfile().then(() => {
+      this.user = this.getUser;
+    });
   }
     
 };

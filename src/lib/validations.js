@@ -152,7 +152,7 @@ export const validatePassConf = (password, passConf) => {
 }
 
 
-export const validateNumber = (bvn, name, length) => {
+export const validateNumber = (bvn, name, length = false) => {
     if(!bvn.trim().length){
         return {
             error: `Your ${name} is required`,
@@ -167,7 +167,7 @@ export const validateNumber = (bvn, name, length) => {
         }
     }
     
-    if(bvn.trim().length !== length){
+    if(bvn.trim().length !== length && length){
         return {
             error: `Your ${name} must be ${length} characters long`,
             isValid: false

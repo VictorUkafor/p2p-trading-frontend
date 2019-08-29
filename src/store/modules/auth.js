@@ -1,6 +1,8 @@
 import axios from 'axios';
+import router from '../../router';
 
 const api = process.env.VUE_APP_BACKEND_API;
+
 
 const state = {
     auth: localStorage.getItem('auth') || false,
@@ -102,11 +104,55 @@ const actions = {
     async loginUser({ commit }, body) {
         try{
             const res = await axios.post(`${api}/auth/login`, body);
-            commit('setAuth', true);
-            commit('setAuthToken', res.data.token);
-            localStorage.setItem('token', res.data.token);
-            localStorage.setItem('auth', true);
+             console.log('logooooooo', res.data);
+             localStorage.setItem('token', res.data.token);                
+                
+            if(!res.data.two_fa){
+                commit('setAuth', true); 
+                commit('setAuthToken', res.data.token);
+                localStorage.setItem('auth', true);  
+                router.go('/dashboard');
+            }
+
+            if(res.data.two_fa === 'sms'){
+                router.push('/2fa-login/sms');
+            }
+
+            if(res.data.two_fa === 'google'){
+                router.push('/2fa-login/google');
+            }
+
         } catch(e){
+            localStorage.removeItem('token');
+            commit('setAuth', false);
+            commit('setError', e.response.data.errorMessage || 
+            e.response.data.errors || 
+            'Your request could not be process at this time, please try again later');
+        }
+    },
+    async smsLogin({ commit }, body) {
+        try{
+            const res = await axios.post(`${api}/auth/login-with-sms`, body);
+            const token = localStorage.getItem('token');
+            commit('setAuth', true); 
+            commit('setAuthToken', token);
+            localStorage.setItem('auth', true);
+            return router.go('/dashboard');             
+        } catch(e){
+            localStorage.removeItem('token');
+            commit('setAuth', false);
+            commit('setError', e.response.data.errorMessage || 
+            e.response.data.errors || 
+            'Your request could not be process at this time, please try again later');
+            return router.go('/login');   
+        }
+    },
+    async googleLogin({ commit }, body) {
+        try{
+            const res = await axios.post(`${api}/auth/login-with-google`, body);
+            commit('setAuth', true);            
+        } catch(e){
+            localStorage.removeItem('token');
             commit('setAuth', false);
             commit('setError', e.response.data.errorMessage || 
             e.response.data.errors || 

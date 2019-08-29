@@ -202,8 +202,9 @@
                         <span class="custom-toggle-slider rounded-circle"></span>
                       </label> 
                       </span></p>
-                    <small>You currently have auto logout <strong>disabled</strong>.
-                     This means your account is not automatically logged out when
+                    <small>You currently have auto logout 
+                      <strong>{{user.notifications.auto_logout ? 'enabled' : 'disabled'}}</strong>.
+                     This means your account is{{user.notifications.auto_logout ? '' : ' not'}} automatically logged out when
                       you close or dismiss this app.</small>
                   </div>
                   <hr/>
@@ -214,7 +215,7 @@
                       personal data. <strong>This action cannot be undone</strong>. To do so, please
                        contact us using the button below.</small> <br/> <br/>
 
-                    <router-link :to="{name: 'mail-us'}" target="_blank">
+                    <router-link :to="{ name: 'mail-us', params: { type: 'close account' }}" target="_blank">
                     <button class="btn btn-default mb-sm-0">Close your account</button>
                     </router-link>
 
@@ -260,7 +261,8 @@ export default {
       isValid: false,
       loading: false,
       user: {
-        notifications: {}
+        notifications: {
+        }
       },
     };
   },
@@ -317,7 +319,7 @@ export default {
       if(this.faType === 'SMS'){
         this.$store.commit('clearMessages');
         this.sms2Fa().then((res) => {
-          this.changeState();           
+          this.initialState();           
           this.otpSent = !res.data.set;
           this.loading = false;
           this.toggle = false;
@@ -335,7 +337,7 @@ export default {
       if(this.faType === 'Google Authenticator'){
         this.loading = true;
         this.google2Fa().then((res) => {
-          this.changeState();  
+          this.initialState();  
           this.otpSent = res.data.set;  
           this.qrCode = res.data;       
           this.loading = false;
@@ -358,8 +360,7 @@ export default {
       if(status && this.faType === 'SMS'){
         this.loading = true;
         this.setSMS2fa(body).then(() => {
-          this.changeState(); 
-          this.loading = false;
+          this.initialState(); 
           this.otpSent = false;
         }).catch((e) => {
           this.loading = false;
@@ -371,8 +372,7 @@ export default {
       if(status && this.faType === 'Google Authenticator'){
         this.loading = true;
         this.setGoogle2fa(body).then(() => {
-          this.changeState(); 
-          this.loading = false;
+          this.initialState(); 
           this.otpSent = false;
         }).catch((e) => {
           this.loading = false;
@@ -380,37 +380,48 @@ export default {
       }
 
     },
-    changeState(){
-    this.getProfile().then((res) => {      
-      
-      this.user = res.data.user;
-      this.fa = res.data.user.two_fa;
-      this.user.notifications = res.data.user.notifications ? 
-      res.data.user.notifications : {};
-
-      if(res.data.user.two_fa === 'sms'){
-        this.faType = 'SMS';
-      }
-      if(res.data.user.two_fa === 'google'){
-        this.faType = 'Google Authenticator';
-      }
-      if(res.data.user.sms2fa){
-        this.smsSetup = true; 
-      }
-      if(res.data.user.google2fa_secret){
-        this.googleSetup = true; 
-      }
-
-    }); 
+    initialState(){
+      this.faType = 'SMS';
+      this.otp = '';
+      this.errors = {
+        otp: '',
+      };
+      this.isValid = false;
+      this.loading = false;
     },
   },
   computed: {
     ...mapGetters(['getError', 'getMessage', 'getUser']),
   },
+  mounted(){
+    if(this.user.notifications.auto_logout){
+      window.onbeforeunload = (e) => {
+        this.logOut();
+      }
+    }  
+  },
   created(){
-    this.changeState(); 
-    console.log('created.....', this.user)
-  }
+    this.getProfile().then(() => {
+    this.user = this.getUser;
+    this.fa = this.user.two_fa;
+
+    if(this.user.two_fa === 'sms'){
+      this.faType = 'SMS';
+    }
+
+    if(this.user.two_fa === 'google'){
+      this.faType = 'Google Authenticator';
+    }
+
+    if(this.user.sms2fa){
+      this.smsSetup = true; 
+    }
+
+    if(this.user.google2fa_secret){
+      this.googleSetup = true; 
+    }    
+  }); 
+ }
     
 };
 

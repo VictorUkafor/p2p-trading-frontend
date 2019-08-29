@@ -5,7 +5,7 @@
 
 
 
-    <div v-if="getUser.id" class="container pt-lg-md">
+    <div v-if="user.id" class="container pt-lg-md">
         <div class="row justify-content-center">
           <div class="col-lg-8">
           <div class="card bg-secondary shadow">
@@ -62,7 +62,7 @@
                         class="form-control"
                         type="text"
                         disabled
-                        :value=getUser.email
+                        :value=user.email
                         aria-describedby="addon-right addon-left"
                         >
                     </div>
@@ -76,7 +76,7 @@
                         class="form-control"
                         type="text"
                         disabled
-                        value="Account Removal"
+                        :value=formSubject
                         aria-describedby="addon-right addon-left"
                         >
                                         
@@ -148,6 +148,9 @@ export default {
         message: '',
         file: '',
       },
+      user: {
+        notifications: {},
+      }
     };
   },
   methods: {
@@ -170,7 +173,7 @@ export default {
       const body = {
         name: this.getUser.first_name+' '+this.getUser.last_name,
         email: this.getUser.email,
-        subject: 'Account Removal',
+        subject: this.formSubject,
         message: this.message ? this.message.trim() : 'Account Removal'
       }
       
@@ -186,11 +189,25 @@ export default {
     ...mapGetters(['getError', 'getMessage', 'getUser']),
     userName(){
       return `${this.getUser.first_name} ${this.getUser.last_name}`;
+    },
+    formSubject(){
+      if(this.$route.params.type === 'close account'){
+        return "Account Removal";
+      }
+    }
+  },
+  mounted(){
+    if(this.user.notifications.auto_logout){
+      window.onbeforeunload = (e) => {
+        this.logOut();
+      }
     }
   },
   created(){
+    this.getProfile().then(() => {
+      this.user = this.getUser;
+    }); 
     this.$store.commit('clearMessages');
-    this.getProfile();
   }
     
 };

@@ -63,7 +63,9 @@
                     <router-link to="/bank-accounts" class="dropdown-item"
                     :class="$route.name === 'bank-accounts' ? 'active': ''">Bank Accounts and Cards</router-link>
                     <router-link to="/security-and-settings" class="dropdown-item" 
-                    :class="$route.name === 'setings' ? 'active': ''">Security and Settings</router-link>
+                    :class="$route.name === 'settings' ? 'active': ''">Security and Settings</router-link>
+                    <router-link to="/mock-accounts" class="dropdown-item" 
+                    :class="$route.name === 'mock-accounts' ? 'active': ''">Mock Accounts</router-link>
                 </base-dropdown>
       </ul>
 
@@ -112,7 +114,8 @@ export default {
       if(this.$route.name === 'verify-identity' || 
       this.$route.name === 'edit-profile' ||
       this.$route.name === 'bank-accounts' || 
-      this.$route.name === 'settings')
+      this.$route.name === 'settings' ||
+      this.$route.name === 'mock-accounts')
       return true;
     }
   },

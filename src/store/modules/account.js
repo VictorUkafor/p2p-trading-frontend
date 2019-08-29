@@ -10,14 +10,11 @@ const headers = {
 
 const api = process.env.VUE_APP_BACKEND_API;
 
-const state = {
-};
+const state = {};
 
-const getters = {
-};
+const getters = {};
 
-const mutations = {
-};
+const mutations = {};
 
 const actions = {
     async addAccount({ commit }, body) {
@@ -139,6 +136,38 @@ const actions = {
             return res;
         } catch(e){
             commit('setError', e.response.data.errorMessage);
+            console.log('wwwww', e.response.data);
+        }
+    },
+    async createMockAccount({ commit }, body) {
+        try{
+            const res = await axios.post(`${api}/banks`, body, headers);
+            commit('setMessage', res.data.successMessage);
+            console.log('wwwww', res.data);
+            return res;
+        } catch(e){
+            commit('setError', e.response.data.errorMessage);
+            console.log('wwwww', e.response.data);
+        }
+    },
+    async getMockAccounts() {
+        try{
+            const res = await axios.get(`${api}/banks`, headers);
+            console.log('wwwww', res.data);
+            return res;
+        } catch(e){
+            console.log('wwwww', e.response.data);
+        }
+    },
+    async fundMock({ commit }, body) {
+        try{
+            const res = await axios.post(`${api}/banks/${body.account_number}`, body, headers);
+            console.log('wwwww', res.data);
+            commit('setMessage', res.data.successMessage);
+            return res;
+        } catch(e){
+            commit('setError', e.response.data.errorMessage || 
+            e.response.data.errors.amount[0]);
             console.log('wwwww', e.response.data);
         }
     },

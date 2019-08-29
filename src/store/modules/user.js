@@ -1,6 +1,7 @@
 import axios from 'axios';
 
 const token = localStorage.getItem('token');
+
 const headers = { 
     headers: {
         'Authorization' : `Bearer ${token}`,

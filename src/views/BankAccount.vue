@@ -153,6 +153,9 @@ export default {
       },
       accounts: {},
       selected: 0,
+      user: {
+        notifications: {},
+      }
     };
   },
   methods: {
@@ -227,13 +230,23 @@ export default {
   computed: {
     ...mapGetters(['getError', 'getMessage', 'getUser']),
   },
+  mounted(){
+    if(this.user.notifications.auto_logout){
+      window.onbeforeunload = (e) => {
+        this.logOut();
+      }
+    }
+  },
   created(){
     this.getProfile().then((res) => {
       this.accounts = res.data.user.bankAccounts ? 
       res.data.user.bankAccounts : {};
       this.bvn = res.data.user.bvn ? 
-      res.data.user.bvn : {}
+      res.data.user.bvn : {};
+
+      this.user = this.getUser;
     });
+    
     
   }
     

@@ -5,7 +5,7 @@
 
 
 
-    <div v-if="getUser.id" class="container pt-lg-md">
+    <div v-if="user.id" class="container pt-lg-md">
         <div class="row justify-content-center">
           <div class="col-lg-8">
           <div class="card bg-secondary shadow">
@@ -13,7 +13,7 @@
 
                 <div v-if="!bvnNumber.verified" class="text-center mb-10">
                   <h5><strong>Verify Identity</strong></h5>
-                  <div v-if="getUser.bvn && !bvnNumber.verified && !otpSent" 
+                  <div v-if="user.bvn && !bvnNumber.verified && !otpSent" 
                   class="text-center text-muted mb-4">
                   <small>To change or edit your BVN number, just enter the new one
                     in the field below</small><br/>
@@ -41,7 +41,7 @@
                     class="alert alert-danger" 
                     role="alert">{{ error || getError }}</div>
 
-                  <div v-if="!bvnNumber.bvn_number && !getUser.bvn && !otpSent" 
+                  <div v-if="!bvnNumber.bvn_number && !user.bvn && !otpSent" 
                   class="form-group input-group-alternative">
                     <div class="input-group-prepend">
                       <span class="input-group-text">
@@ -62,7 +62,7 @@
                                         
                   </div>
                                 
-                  <div v-if="getUser.bvn && !bvnNumber.verified  && !otpSent" 
+                  <div v-if="user.bvn && !bvnNumber.verified  && !otpSent" 
                   class="form-group input-group-alternative">
                     <div class="input-group-prepend">
                       <span class="input-group-text">
@@ -83,7 +83,7 @@
                                         
                   </div>
 
-                  <div v-if="!bvn && getUser.bvn && !bvnNumber.verified  && !otpSent"
+                  <div v-if="!bvn && user.bvn && !bvnNumber.verified  && !otpSent"
                    class="form-group input-group-alternative">
                     <div class="input-group-prepend">
                       <span class="input-group-text">
@@ -92,11 +92,8 @@
                         </slot>
                       </span>
               
-                      <input 
-                        class="form-control"
-                        type="text"
-                        disabled
-                        :value="formatPhone"
+                      <input class="form-control" type="text"
+                        disabled :value="formatPhone"
                         aria-describedby="addon-right addon-left"
                         >
                     </div>
@@ -127,26 +124,24 @@
 
                   <div class="text-center" >
                                     
-                    <button 
-                      v-if="loading" 
-                      disabled 
+                    <button v-if="loading" disabled 
                       class="btn btn-neutral my-4">
                       <span class="spinner-border spinner-border-sm" 
                       role="status" aria-hidden="true"></span>
                       Loading . . .</button>
 
                       <button 
-                      v-if="!loading && getUser.bvn && !bvnNumber.verified && !otpSent" 
+                      v-if="!loading && user.bvn && !bvnNumber.verified && !otpSent" 
                       :disabled="noErrors" 
                       class="btn btn-default my-4">Edit BVN</button>
 
                     <button 
-                      v-if="!loading && !getUser.bvn && !otpSent" 
+                      v-if="!loading && !user.bvn && !otpSent" 
                       :disabled="noErrors" 
                       class="btn btn-default my-4">Add BVN</button>                      
                       
                     <button 
-                      v-if="!loading && getUser.bvn && !bvnNumber.verified && !bvn && !otpSent" 
+                      v-if="!loading && user.bvn && !bvnNumber.verified && !bvn && !otpSent" 
                       class="btn btn-default my-4">Send OTP</button>
 
                     <button 
@@ -162,7 +157,8 @@
                 <div v-if="bvnNumber.verified" class="text-center mb-10">
                   <h5><strong>Identity Verified</strong></h5>
                   <div class="text-center text-muted mb-4">
-                  <small>Your Bank Verification Number has been verified successfully at {{ getUser.bvn.updated_at }}</small>
+                  <small>Your Bank Verification Number has 
+                    been verified successfully at {{ user.bvn.updated_at }}</small>
                   </div>
                   <hr/>
 
@@ -200,6 +196,9 @@ export default {
       },
       otpSent: false,
       otp: '',
+      user: {
+        notifications: {}
+      }
     };
   },
   methods: {
@@ -332,13 +331,22 @@ export default {
       return !this.bvn || !this.isValid;
     },
   },
+  mounted(){
+    if(this.user.notifications.auto_logout){
+      window.onbeforeunload = (e) => {
+        this.logOut();
+      }
+    }
+  },
   created(){
     this.getProfile().then((res) => {
+      this.user = this.getUser;
       this.bvnNumber = res.data.user.bvn ? res.data.user.bvn : {
       verified: false,
       bvn_number: '',
       };  
     });
+    
   }
     
 };

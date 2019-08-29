@@ -92,9 +92,7 @@
                       role="status" aria-hidden="true"></span>
                       Loading . . .</button>
 
-                    <button 
-                      v-if="!loading" 
-                      :disabled="noErrors()" 
+                    <button v-if="!loading" :disabled="noErrors" 
                       class="btn btn-default my-4">Login</button>
                   </div>
                 </form>
@@ -181,32 +179,28 @@ export default {
         this.passwordValidate();
         status = this.isValid;
       }
-            
-      if(status){
-      this.loading = true;
+
 
       const body = {
         email: this.email.trim(),
         password: this.password.trim()
+      }  
+      
+      
+      if(status){
+        this.loading = true;
+        this.loginUser(body)
+        .then(() => this.loading = false);
       }
-
-      this.loginUser(body)
-      .then(() => {
-        this.initialState();
-        this.$router.go('/dashboard');
-        });
-      }
- 
     },
+  },
+  computed: {
+    ...mapGetters(['getError']),    
     noErrors(){
       return (!this.email || !this.password) || !this.isValid;
     }
-    
   },
-  computed: mapGetters(['getError']),
-  created(){
-    this.$store.commit('clearMessages');
-  }
+
 
     
 };

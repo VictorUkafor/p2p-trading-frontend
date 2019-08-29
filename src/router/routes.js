@@ -12,7 +12,8 @@ import EditProfile from '../views/EditProfile';
 import BankAccount from '../views/BankAccount';
 import Settings from '../views/Settings';
 import MailUs from '../views/MailUs';
-
+import MockAccount from '../views/MockAccount';
+import TwoFactor from '../views/TwoFactor';
 
 export default [
   {
@@ -64,6 +65,19 @@ export default [
     },
     meta: {
       title: 'Login - P2P Trading',
+      requiresVisitor: true,
+    } 
+  },
+  {
+    path: '/2fa-login/:type',
+    name: '2fa-login',
+    components: {
+      header: AppHeader,
+      default: TwoFactor,
+      footer: AppFooter
+    },
+    meta: {
+      title: 'Two Factor Login - P2P Trading',
       requiresVisitor: true,
     } 
   },
@@ -159,7 +173,7 @@ export default [
     },
   },
   {
-    path: '/mail-us',
+    path: '/mail-us/:type',
     name: 'mail-us',
     components: {
       header: AppHeader,
@@ -168,6 +182,19 @@ export default [
     },
     meta: {
       title: 'Mail Us | P2P Trading',
+      requiresAuth: true,
+    },
+  },
+  {
+    path: '/mock-accounts',
+    name: 'mock-accounts',
+    components: {
+      header: AppHeader,
+      default: MockAccount,
+      footer: AppFooter
+    },
+    meta: {
+      title: 'Mock Account | P2P Trading',
       requiresAuth: true,
     },
   }
