@@ -1,4 +1,5 @@
 import Vue from 'vue';
+import VueClipboard from 'vue-clipboard2'
 import App from './App';
 import router from './router';
 import Argon from "./plugins/argon-kit";
@@ -6,6 +7,7 @@ import store from './store';
 
 Vue.config.productionTip = false;
 Vue.use(Argon);
+Vue.use(VueClipboard);
 
 router.afterEach((to, from) => {
   Vue.nextTick( () => {

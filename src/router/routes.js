@@ -14,6 +14,8 @@ import Settings from '../views/Settings';
 import MailUs from '../views/MailUs';
 import MockAccount from '../views/MockAccount';
 import TwoFactor from '../views/TwoFactor';
+import Wallet from '../views/Wallet';
+import SendCoin from '../views/SendCoin';
 
 export default [
   {
@@ -195,6 +197,32 @@ export default [
     },
     meta: {
       title: 'Mock Account | P2P Trading',
+      requiresAuth: true,
+    },
+  },
+  {
+    path: '/my-wallet',
+    name: 'my-wallet',
+    components: {
+      header: AppHeader,
+      default: Wallet,
+      footer: AppFooter
+    },
+    meta: {
+      title: 'My Wallet | P2P Trading',
+      requiresAuth: true,
+    },
+  },
+  {
+    path: '/send-and-receive-coin',
+    name: 'send-coin',
+    components: {
+      header: AppHeader,
+      default: SendCoin,
+      footer: AppFooter
+    },
+    meta: {
+      title: 'Send and Receive Coin | P2P Trading',
       requiresAuth: true,
     },
   }

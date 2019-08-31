@@ -24,7 +24,7 @@
                     Visit the <strong>"Verify Identity"</strong> page and follow the instructions. </p>
 
                     <router-link to="/verify-identity">
-                    <button class="btn btn-default mb-sm-0">Verify Your Identity</button>
+                    <button class="btn btn-outline-default mb-sm-0">Verify Your Identity</button>
                     </router-link>
                 </div>
             

@@ -5,7 +5,7 @@
 
 
 
-    <div v-if="user.id" class="container pt-lg-md">
+    <div v-if="getUser.id" class="container pt-lg-md">
         <div class="row justify-content-center">
           <div class="col-lg-8">
           <div class="card bg-secondary shadow">

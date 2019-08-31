@@ -5,7 +5,7 @@
 
 
 
-    <div v-if="user.id" class="container pt-lg-md">
+    <div v-if="getUser.id" class="container pt-lg-md">
         <div class="row justify-content-center">
           <div class="col-lg-8">
           <div class="card bg-secondary shadow">
@@ -215,7 +215,7 @@ export default {
     },
     otpValidate() {
       this.$store.commit('clearMessages');
-      const { error, isValid } = validateNumber(this.otp, 'OTP', 6);
+      const { error, isValid } = validateNumber(this.otp, 'OTP', false);
       this.error = error;
       this.isValid = isValid;
     },
@@ -339,6 +339,7 @@ export default {
     }
   },
   created(){
+    this.$store.commit('clearMessages');
     this.getProfile().then((res) => {
       this.user = this.getUser;
       this.bvnNumber = res.data.user.bvn ? res.data.user.bvn : {

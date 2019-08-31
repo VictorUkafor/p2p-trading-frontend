@@ -39,8 +39,12 @@ const actions = {
     async activateAccount({ commit }, body) {
         try{
             const res = await axios.post(`${api}/auth/account-activation/${body.token}`, body);
-            commit('setMessage', res.data.successMessage);
             localStorage.removeItem('activationToken');
+            localStorage.setItem('token', res.data.token); 
+            localStorage.setItem('auth', true);
+            commit('setAuth', true); 
+            commit('setAuthToken', res.data.token);
+            router.go('/dashboard');
         } catch(e){
             commit('setError', e.response.data.errorMessage || 
             e.response.data.errors || 
@@ -104,7 +108,6 @@ const actions = {
     async loginUser({ commit }, body) {
         try{
             const res = await axios.post(`${api}/auth/login`, body);
-             console.log('logooooooo', res.data);
              localStorage.setItem('token', res.data.token);                
                 
             if(!res.data.two_fa){

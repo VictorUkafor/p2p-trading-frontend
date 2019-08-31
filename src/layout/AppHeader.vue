@@ -43,13 +43,15 @@
                     <router-link to="#" class="dropdown-item">My Trade Ads</router-link>
                     <router-link to="#" class="dropdown-item">My Trade Activity</router-link>
                 </base-dropdown>
-                <base-dropdown tag="li" class="nav-item">
+                <base-dropdown tag="li" class="nav-item" :class="walletActive ? 'active': ''">
                     <a slot="title" href="#" class="nav-link" data-toggle="dropdown" role="button">
                         <i class="ni ni-credit-card"></i>
                         <span class="nav-link-inner--text">Wallet</span>
                     </a>
-                    <router-link to="#" class="dropdown-item">Send & Recieve Coins</router-link>
-                    <router-link to="#" class="dropdown-item">My Wallet</router-link>
+                    <router-link to="/send-and-receive-coin" class="dropdown-item"
+                    :class="$route.name === 'send-coin' ? 'active': ''">Send & Recieve Coins</router-link>
+                    <router-link to="/my-wallet" class="dropdown-item"
+                    :class="$route.name === 'my-wallet' ? 'active': ''">My Wallet</router-link>
                 </base-dropdown>
                 <base-dropdown tag="li" class="nav-item" :class="accountActive ? 'active': ''">
                     <a slot="title" href="#" class="nav-link" data-toggle="dropdown" role="button">
@@ -116,6 +118,11 @@ export default {
       this.$route.name === 'bank-accounts' || 
       this.$route.name === 'settings' ||
       this.$route.name === 'mock-accounts')
+      return true;
+    },
+    walletActive(){
+      if(this.$route.name === 'my-wallet' || 
+      this.$route.name === 'send-coin')
       return true;
     }
   },

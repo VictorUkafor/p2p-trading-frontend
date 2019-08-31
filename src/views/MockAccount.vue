@@ -342,6 +342,7 @@ export default {
     }
   },
   created(){
+    this.$store.commit('clearMessages');
     this.getProfile().then((res) => {
       this.accounts = res.data.user.mockAccounts ? 
       res.data.user.mockAccounts : [];
