@@ -33,13 +33,14 @@
                     <router-link to="#" class="dropdown-item">Buy & Sell Coins</router-link>
                     <router-link to="#" class="dropdown-item">My Orders</router-link>
                 </base-dropdown>
-                <base-dropdown tag="li" class="nav-item">
+                <base-dropdown tag="li" class="nav-item" :class="tradeActive ? 'active': ''">
                     <a slot="title" href="#" class="nav-link" data-toggle="dropdown" role="button">
                         <i class="ni ni-chart-bar-32"></i>
                         <span class="nav-link-inner--text">Trade</span>
                     </a>
                     <router-link to="#" class="dropdown-item">Find Trade Ad</router-link>
-                    <router-link to="#" class="dropdown-item">Post Trade Ad</router-link>
+                    <router-link to="/post-trade-ads" class="dropdown-item"
+                     :class="$route.name === 'post-trade' ? 'active': ''">Post Trade Ad</router-link>
                     <router-link to="#" class="dropdown-item">My Trade Ads</router-link>
                     <router-link to="#" class="dropdown-item">My Trade Activity</router-link>
                 </base-dropdown>
@@ -123,6 +124,10 @@ export default {
     walletActive(){
       if(this.$route.name === 'my-wallet' || 
       this.$route.name === 'send-coin')
+      return true;
+    },
+    tradeActive(){
+      if(this.$route.name === 'post-trade')
       return true;
     }
   },

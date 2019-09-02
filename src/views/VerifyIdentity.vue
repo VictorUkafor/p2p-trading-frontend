@@ -207,7 +207,7 @@ export default {
     ]),
     bvnValidate() {
       this.$store.commit('clearMessages');
-      const { error, isValid } = validateNumber(this.bvn, 'BVN', 10);
+      const { error, isValid } = validateNumber(this.bvn, 'BVN');
       this.error = error;
       this.isValid = isValid;
      console.log('ddddd', this.bvn);

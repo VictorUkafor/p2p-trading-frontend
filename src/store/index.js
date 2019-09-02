@@ -4,6 +4,7 @@ import auth from './modules/auth';
 import user from './modules/user';
 import account from './modules/account';
 import transfer from './modules/transfer';
+import trade from './modules/trade';
 
 Vue.use(Vuex);
 
@@ -12,6 +13,7 @@ export default new Vuex.Store({
     auth,
     user,
     account,
-    transfer
+    transfer,
+    trade
   }
 });

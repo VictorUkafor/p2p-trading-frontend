@@ -16,6 +16,7 @@ import MockAccount from '../views/MockAccount';
 import TwoFactor from '../views/TwoFactor';
 import Wallet from '../views/Wallet';
 import SendCoin from '../views/SendCoin';
+import PostTrade from '../views/PostTrade';
 
 export default [
   {
@@ -223,6 +224,19 @@ export default [
     },
     meta: {
       title: 'Send and Receive Coin | P2P Trading',
+      requiresAuth: true,
+    },
+  },
+  {
+    path: '/post-trade-ads',
+    name: 'post-trade',
+    components: {
+      header: AppHeader,
+      default: PostTrade,
+      footer: AppFooter
+    },
+    meta: {
+      title: 'Post Trade Ads | P2P Trading',
       requiresAuth: true,
     },
   }
