@@ -38,9 +38,10 @@
                         <i class="ni ni-chart-bar-32"></i>
                         <span class="nav-link-inner--text">Trade</span>
                     </a>
-                    <router-link to="#" class="dropdown-item">Find Trade Ad</router-link>
+                    <router-link to="/find-trade-ads" class="dropdown-item"
+                    :class="$route.name === 'find-trade' ? 'active': ''">Find Trade Ad</router-link>
                     <router-link to="/post-trade-ads" class="dropdown-item"
-                     :class="$route.name === 'post-trade' ? 'active': ''">Post Trade Ad</router-link>
+                    :class="$route.name === 'post-trade' ? 'active': ''">Post Trade Ad</router-link>
                     <router-link to="#" class="dropdown-item">My Trade Ads</router-link>
                     <router-link to="#" class="dropdown-item">My Trade Activity</router-link>
                 </base-dropdown>
@@ -127,7 +128,8 @@ export default {
       return true;
     },
     tradeActive(){
-      if(this.$route.name === 'post-trade')
+      if(this.$route.name === 'post-trade' || 
+      this.$route.name === 'find-trade')
       return true;
     }
   },

@@ -23,7 +23,9 @@
                   <div 
                     v-if="getMessage" 
                     class="alert alert-success" 
-                    role="alert">{{ getMessage }}</div>
+                    role="alert">{{ getMessage }}
+                  </div>
+                  
                   <div 
                     v-if="getError" 
                     class="alert alert-danger" 

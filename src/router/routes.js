@@ -17,6 +17,8 @@ import TwoFactor from '../views/TwoFactor';
 import Wallet from '../views/Wallet';
 import SendCoin from '../views/SendCoin';
 import PostTrade from '../views/PostTrade';
+import FindTrade from '../views/FindTrade';
+
 
 export default [
   {
@@ -237,6 +239,19 @@ export default [
     },
     meta: {
       title: 'Post Trade Ads | P2P Trading',
+      requiresAuth: true,
+    },
+  },
+  {
+    path: '/find-trade-ads',
+    name: 'find-trade',
+    components: {
+      header: AppHeader,
+      default: FindTrade,
+      footer: AppFooter
+    },
+    meta: {
+      title: 'Find Trade Ads | P2P Trading',
       requiresAuth: true,
     },
   }

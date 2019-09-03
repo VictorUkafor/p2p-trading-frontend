@@ -118,7 +118,7 @@
                   <div class="input-group mb-3">
                       <input 
                         v-model="price"
-                        :disabled="priceType === 'Dynamic'"
+                        :disabled="priceType === 'dynamic'"
                         class="form-control"
                         type="text"
                         :placeholder=pricePlaceholder
