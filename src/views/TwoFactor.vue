@@ -45,7 +45,7 @@
                       <input 
                         v-model="otp"
                         class="form-control"
-                        type="text"
+                        type="password"
                         placeholder="Enter your OTP"
                         name="otp"
                         aria-describedby="addon-right addon-left"

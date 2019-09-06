@@ -1,16 +1,19 @@
 <template>
   <section class="section section-shaped section-lg my-0">
     <div class="shape shape-style-1 bg-gradient-default">
-      <span/>
-      <span/>
-      <span/>
-      <span/>
-      <span/>
-      <span/>
-      <span/>
-      <span/>
     </div>
-
+          
+    <div v-if="!getUser.id" class="shape-style-1"
+    :style="{ 
+      marginLeft: '40%',
+      marginTop: '5em',
+      marginBottom: '5em'}" >
+      <span 
+      class="spinner-border spinner-border-sm" 
+      role="status" 
+      aria-hidden="true">
+      </span>    
+    </div>
 
     <div v-if="getUser.id" class="container pt-lg-md">
         <div class="row justify-content-center">
@@ -153,14 +156,6 @@
                           </div>
                           </div>                  
                           
-                    <div class="text-left">
-                      <small><span :style="{ fontWeight: 'bold' }">Current balance</span>
-                        <span class="float-right">0.00 {{coin}}</span></small><br>
-                      <small><span :style="{ fontWeight: 'bold' }">Est. transfer fee</span>
-                        <span class="float-right">0.00 {{coin}}</span></small><br>
-                      <small><span :style="{ fontWeight: 'bold' }">Balance after send</span>
-                        <span class="float-right">0.00 {{coin}}</span></small>
-                    </div>
                     <hr/>
 
 
@@ -172,7 +167,7 @@
                       Loading . . .</button>
 
                     <button v-if="!loading" :disabled="!isValid" 
-                      class="btn btn-default my-4">Review Details</button>
+                      class="btn btn-default my-4">Submit</button>
 
 
 
@@ -227,7 +222,7 @@ import { mapGetters, mapActions } from 'vuex';
 import { 
   validateEmail, 
   validateName, 
-  validateNumber 
+  validateAmount 
 } from '../lib/validations';
 
 
@@ -238,7 +233,6 @@ export default {
       sendMethod: 'Wallet Address',
       method: '',
       amount: '',
-      verified: false,
       trans: 'send',
       coin: 'BTC',
       isValid: false,
@@ -247,9 +241,6 @@ export default {
         amount: ''
       },
       loading: false,
-      user: {
-        notifications: {},
-      },
       cryptos: {
         BTC: 'Bitcoin', 
         LTC: 'Litecoin', 
@@ -272,7 +263,7 @@ export default {
     },
     amountValidate() {
       this.$store.commit('clearMessages');
-      const { error, isValid } = validateNumber(this.amount, 'amount');      
+      const { error, isValid } = validateAmount(this.amount, 'amount');      
       this.errors.amount = error;
       this.isValid = isValid;
     },
@@ -316,7 +307,18 @@ export default {
     changeCoin(coin){
       this.$store.commit('clearMessages');
       this.coin = coin;
-      console.log('coin...', this.coin);
+
+      if(this.trans === 'receive'){
+        this.loading = true;
+        const body = { coin: this.coin };
+
+        this.generateAddress(body)
+        .then((res) => {
+          this.loading = false;
+          this.address = res.data.wallet_address;
+        }).catch(() => this.loading = false);
+
+      }
     },
     changeTrans(trans){
       this.$store.commit('clearMessages');
@@ -327,12 +329,13 @@ export default {
         this.loading = true;
         const body = { coin: this.coin };
 
-        this.generateAddress(body).then((res) => {
+        this.generateAddress(body)
+        .then((res) => {
           this.loading = false;
           this.address = res.data.wallet_address;
-        }).catch(() => this.loading = false)
+        }).catch(() => this.loading = false);
+
       }
-      console.log('trans...', this.trans);
     },
     copy(){
       this.copied = true;
@@ -344,7 +347,8 @@ export default {
     }
   },
   mounted(){
-    if(this.user.notifications.auto_logout){
+    if(this.getUser.notifications && 
+    this.getUser.notifications.auto_logout){
       window.onbeforeunload = (e) => {
         this.logOut();
       }
@@ -352,6 +356,9 @@ export default {
   },
   computed: {
     ...mapGetters(['getError', 'getUser', 'getMessage']),
+    verified(){
+      return this.getUser.bvn && this.getUser.bvn.verified;
+    },
     methodPlaceholder(){
       return `Enter the receiver's ${this.sendMethod === 'Wallet Address' ? 
       this.cryptos[this.coin] : 'P2P'} ${this.sendMethod}`;
@@ -374,11 +381,7 @@ export default {
   created(){
     this.getWallet();
     this.$store.commit('clearMessages');
-    this.getProfile().then(() => {
-      this.user = this.getUser;
-      this.user = this.user.notifications ? this.user.notifications : {};
-      this.verified = this.getUser.bvn ? this.getUser.bvn.verified : false;
-    });
+    this.getProfile();
   }
     
 };

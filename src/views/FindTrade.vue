@@ -1,8 +1,18 @@
 <template>
   <section class="section section-shaped section-lg my-0">
     <div class="shape shape-style-1 bg-gradient-default">
-
-      <span/>
+    </div>
+          
+    <div v-if="!getUser.id" class="shape-style-1"
+    :style="{ 
+      marginLeft: '40%',
+      marginTop: '5em',
+      marginBottom: '5em'}" >
+      <span 
+      class="spinner-border spinner-border-sm" 
+      role="status" 
+      aria-hidden="true">
+      </span>    
     </div>
 
 
@@ -35,24 +45,53 @@
                   <hr/>
               </div>  
 
-              <div v-if="trans === trade.type && engaged !== trade.id" 
+              <div v-if="trans !== trade.type" 
               v-for="trade in trades" :key="trade.id" class="text-left">
+
+
+                 <div 
+                    v-if="getError && target.id === trade.id" 
+                    class="alert alert-danger" 
+                    role="alert">{{ getError }}
+                  </div>
+
+                  <div 
+                    v-if="getMessage && target.id === trade.id" 
+                    class="alert alert-success" 
+                    role="alert">{{ getMessage }}
+                  </div>
+
                 <button @click="engageAd(trade)" 
                 v-if="target.id !== trade.id && trade.user_id !== getUser.id"
                 class="btn btn-outline-default mb-sm-0 float-right">
-                  {{trade.type}}
+                  {{trade.type === 'Buy' ? 'Sell' : 'Buy'}}
                 </button>
+
+                <span v-if="loading && trade.min === trade.max && 
+                target.id === trade.id" 
+                class="spinner-border spinner-border-sm float-right" 
+                role="status" aria-hidden="true">
+                </span>
+
                 <p><strong>
-                  <span :style="{ fontWeight: 'bold' }">
-                    {{trade.type}} at {{trade.price}} NGN/{{trade.coin}}
-                  </span><br/>
-                {{trade.min}} - {{trade.max}} {{trade.coin}} <br/>
-                @{{trade.creator.email}}<br/>
+                  <span v-if="trade.min !== trade.max"
+                  :style="{ fontWeight: 'bold' }">
+                    {{trade.type === 'Buy' ? 'Sell' : 'Buy'}} at {{trade.price}}NGN/{{trade.coin}}<br/>
+                  </span>
+                
+                  <span v-if="trade.min === trade.max" 
+                  :style="{ fontWeight: 'bold' }">
+                    {{trade.type === 'Buy' ? 'Sell' : 'Buy'}} {{trade.max}}{{trade.coin}} 
+                    for N{{(trade.price * trade.min)}}<br/>
+                  </span>
+
+                <span v-if="trade.min !== trade.max">{{trade.min}} - {{trade.max}} {{trade.coin}}<br/></span> 
+                @{{trade.creator.email === getUser.email ? 'You' : trade.creator.email}}<br/>
                 {{trade.referenceNo}}<br/>
                 </strong></p>
 
                 <form 
-                  v-if="target.id === trade.id"
+                  v-if="target.id === trade.id && trade.min !== trade.max"
                   role="form" 
                   method="post" 
                   @submit.prevent="processEngage">  
@@ -105,7 +144,7 @@
 </template>
 <script>
 import { mapGetters, mapActions } from 'vuex';
-import { validateNumber } from '../lib/validations';
+import { validateAmount } from '../lib/validations';
 
 
 export default {
@@ -114,7 +153,6 @@ export default {
     return {
       trans: 'Buy',
       coinNumber: '',
-      engaged: '',
       trades: [],
       isValid: false,
       error: '',
@@ -130,14 +168,14 @@ export default {
     coinValidate() {
       this.$store.commit('clearMessages');
       const { error, isValid } = 
-      validateNumber(this.coinNumber, 'value');      
+      validateAmount(this.coinNumber, 'value');      
       this.error = error;
       this.isValid = isValid;
     },
     setState(){
+      this.coinNumber = '';
       this.isValid = false;
-      this.errors = {
-      };
+      this.error = '';
       this.loading = false;
     },
     changeTrans(trans){
@@ -145,14 +183,26 @@ export default {
       this.setState();
       this.trans = null;
       this.trans = trans;
-
-      console.log('trans...', this.trans);
     },
     engageAd(trade){
       this.$store.commit('clearMessages');
       this.target = trade;
       this.coinNumber = ''
-      console.log('target', this.target);
+
+      if(this.target.min === this.target.max){
+        
+        const body = {
+          id: this.target.id,
+          amount_in_coin: this.target.max,
+          amount_in_cash: (this.target.price * this.target.max),
+        } 
+
+        this.loading = true;
+        this.engageTradeAd(body)
+        .then(() => this.setState())
+        .catch(() => this.loading = false);        
+
+      }
     },
     processEngage(){
       let status = true;
@@ -172,10 +222,8 @@ export default {
       if(status){
         this.loading = true;
         this.engageTradeAd(body)
-        .then(() => {
-          this.loading = false;
-          this.engaged = this.trade.id;
-          }).catch(() => this.loading = false);
+        .then(() => this.setState())
+        .catch(() => this.loading = false);
       }
     },
   },
@@ -200,7 +248,6 @@ export default {
     this.getTradeAds().then(res => {
       this.trades = res.data.trades ? 
       res.data.trades : [];
-      console.log('eeerrr',res.data);
     });
   }
     

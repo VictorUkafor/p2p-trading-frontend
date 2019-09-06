@@ -2,6 +2,18 @@
   <section class="section section-shaped section-lg my-0">
     <div class="shape shape-style-1 bg-gradient-default">
     </div>
+          
+    <div v-if="!getUser.id" class="shape-style-1"
+    :style="{ 
+      marginLeft: '40%',
+      marginTop: '5em',
+      marginBottom: '5em'}" >
+      <span 
+      class="spinner-border spinner-border-sm" 
+      role="status" 
+      aria-hidden="true">
+      </span>    
+    </div>
 
 
 
@@ -10,6 +22,7 @@
           <div class="col-lg-8">
           <div class="card bg-secondary shadow">
             <div class="card-body px-lg-5 py-lg-5">
+
 
                 <div class="text-center mb-10">
                   <h5><strong>Create Mock Account</strong></h5>
@@ -90,13 +103,9 @@
 
                   <div class="text-center" >
                                     
-                    <button 
-                      v-if="loading" 
-                      disabled 
-                      class="btn btn-neutral my-4">
-                      <span class="spinner-border spinner-border-sm" 
+                      <span v-if="loading" disabled 
+                      class="spinner-border spinner-border-sm" 
                       role="status" aria-hidden="true"></span>
-                      Loading . . .</button>
 
                       <button v-if="!loading" :disabled="!isValid || !bankName" 
                       class="btn btn-default my-4">Create Account</button>
@@ -134,7 +143,7 @@
                     </p>
                     <p>
                     <span :style="{ fontWeight: 'bold' }">
-                      Found Account  </span> 
+                      Fund Account  </span> 
                     <span class="float-right">
                       <label class="custom-toggle">
                         <input type="checkbox"  
@@ -214,21 +223,18 @@ export default {
       isValid: false,
       loading: false,
       amount: '',
+      accounts: [],
       errors: {
         bankName: '',
         phone: '',
       },
-      accounts: [],
       selected: 0,
-      user: {
-        notifications: {},
-      }
     };
   },
   methods: {
     ...mapActions([
       'getProfile', 'createMockAccount',
-      'getMockAccounts', 'fundMock'
+      'getMockAccounts', 'fundMock', 'logOut'
     ]),
     nameValidate() {
       this.$store.commit('clearMessages');
@@ -250,7 +256,6 @@ export default {
       validateNumber(this.amount, 'amount');
       this.errors.amount = error;
       this.isValid = isValid;
-     console.log('ddddd', this.amount);
     },
     fundNow(id) {
       this.$store.commit('clearMessages');
@@ -270,8 +275,6 @@ export default {
     processForm(){
       let status = true;
 
-      console.log('accounts', this.accounts);
-
       if(status){
         this.nameValidate();
         status = this.isValid;
@@ -287,17 +290,15 @@ export default {
         phone: this.phone.trim(),
       }
 
-
       if(status){  
         this.loading = true;    
         this.createMockAccount(body)
         .then(() => {
           this.getMockAccounts()
           .then((res) => {
-            this.accounts = res.data.accounts;
-            console.log('inside componnents', res.data);
             this.initialState();
-            });
+            this.accounts = res.data.accounts;
+          });
         }).catch(() => this.initialState());
       }
 
@@ -322,9 +323,8 @@ export default {
         .then(() => {
           this.getMockAccounts()
           .then((res) => {
-            this.accounts = res.data.accounts;
-            console.log('inside componnents', res.data);
             this.initialState();
+            this.accounts = res.data.accounts;
             });
         }).catch(() => this.initialState());
       }
@@ -333,9 +333,13 @@ export default {
   },
   computed: {
     ...mapGetters(['getError', 'getMessage', 'getUser']),
+    verified(){
+      return this.getUser.bvn.id && this.getUser.bvn.verified;
+    },
   },
   mounted(){
-    if(this.user.notifications.auto_logout){
+    if(this.getUser.notifications && 
+    this.getUser.notifications.auto_logout){
       window.onbeforeunload = (e) => {
         this.logOut();
       }
@@ -343,12 +347,9 @@ export default {
   },
   created(){
     this.$store.commit('clearMessages');
-    this.getProfile().then((res) => {
-      this.accounts = res.data.user.mockAccounts ? 
-      res.data.user.mockAccounts : [];
-    });
-    this.user = this.getUser;
-    
+    this.getProfile().then(() => {
+      this.accounts = this.getUser.mockAccounts || []; 
+    });    
   }
     
 };

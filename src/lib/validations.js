@@ -174,7 +174,28 @@ export const validateNumber = (bvn, name, length = false) => {
         }
     }
 
+    return {
+        isValid: true,
+        error: '',
+    }
 
+}
+
+
+export const validateAmount = (value, name) => {
+    if(!value.length){
+        return {
+            error: `Your ${name} is required`,
+            isValid: false
+        }
+    }
+
+    if(!(/(\d+(\.\d+)?)/.test(value))){
+        return {
+            error: `Your ${name} is invalid`,
+            isValid: false
+        }
+    }
 
     return {
         isValid: true,

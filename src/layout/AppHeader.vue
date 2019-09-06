@@ -25,13 +25,15 @@
           </a>
         </li>
         </router-link>
-                <base-dropdown tag="li" class="nav-item">
+                <base-dropdown tag="li" class="nav-item" :class="buyActive ? 'active': ''">
                     <a slot="title" href="#" class="nav-link" data-toggle="dropdown" role="button">
                         <i class="ni ni-cart"></i>
                         <span class="nav-link-inner--text">Buy & Sell</span>
                     </a>
-                    <router-link to="#" class="dropdown-item">Buy & Sell Coins</router-link>
-                    <router-link to="#" class="dropdown-item">My Orders</router-link>
+                    <router-link to="/buy-and-sell-coin" class="dropdown-item"
+                    :class="$route.name === 'buy-coin' ? 'active': ''">Buy & Sell Coins</router-link>
+                    <router-link to="/my-orders" class="dropdown-item"
+                    :class="$route.name === 'my-orders' ? 'active': ''">My Orders</router-link>
                 </base-dropdown>
                 <base-dropdown tag="li" class="nav-item" :class="tradeActive ? 'active': ''">
                     <a slot="title" href="#" class="nav-link" data-toggle="dropdown" role="button">
@@ -42,8 +44,10 @@
                     :class="$route.name === 'find-trade' ? 'active': ''">Find Trade Ad</router-link>
                     <router-link to="/post-trade-ads" class="dropdown-item"
                     :class="$route.name === 'post-trade' ? 'active': ''">Post Trade Ad</router-link>
-                    <router-link to="#" class="dropdown-item">My Trade Ads</router-link>
-                    <router-link to="#" class="dropdown-item">My Trade Activity</router-link>
+                    <router-link to="/my-trades" class="dropdown-item"
+                    :class="$route.name === 'my-trades' ? 'active': ''">My Trade Ads</router-link>
+                    <router-link to="/my-trade-activity" class="dropdown-item"
+                    :class="$route.name === 'my-activity' ? 'active': ''">My Trade Activity</router-link>
                 </base-dropdown>
                 <base-dropdown tag="li" class="nav-item" :class="walletActive ? 'active': ''">
                     <a slot="title" href="#" class="nav-link" data-toggle="dropdown" role="button">
@@ -96,18 +100,19 @@
 import { mapGetters, mapActions } from 'vuex';
 import BaseNav from "@/components/BaseNav";
 import BaseDropdown from "@/components/BaseDropdown";
-import CloseButton from "@/components/CloseButton";
+//import CloseButton from "@/components/CloseButton";
 
 
 export default {
   components: {
     BaseNav,
-    CloseButton,
+    //CloseButton,
     BaseDropdown
   },
   methods: {
     ...mapActions(['logOut']),
     logout(event){
+      localStorage.clear();
       this.logOut()
       .then(() => this.$router.go('/login'));
     },
@@ -129,7 +134,14 @@ export default {
     },
     tradeActive(){
       if(this.$route.name === 'post-trade' || 
-      this.$route.name === 'find-trade')
+      this.$route.name === 'find-trade' ||
+      this.$route.name === 'my-trades' ||
+      this.$route.name === 'my-activity')
+      return true;
+    },
+    buyActive(){
+      if(this.$route.name === 'buy-coin' || 
+      this.$route.name === 'my-orders')
       return true;
     }
   },

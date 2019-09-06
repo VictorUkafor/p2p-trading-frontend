@@ -2,6 +2,18 @@
   <section class="section section-shaped section-lg my-0">
     <div class="shape shape-style-1 bg-gradient-default">
     </div>
+          
+    <div v-if="!getUser.id" class="shape-style-1"
+    :style="{ 
+      marginLeft: '40%',
+      marginTop: '5em',
+      marginBottom: '5em'}" >
+      <span 
+      class="spinner-border spinner-border-sm" 
+      role="status" 
+      aria-hidden="true">
+      </span>    
+    </div>
 
 
 
@@ -16,7 +28,7 @@
                   <hr/>
         
                 <form 
-                  v-if="bvn.verified"
+                  v-if="accounts.length < 6"
                   role="form" 
                   method="post"
                   @submit.prevent="processForm">
@@ -72,9 +84,7 @@
 
                   <div class="text-center" >
                                     
-                    <button 
-                      v-if="loading" 
-                      disabled 
+                    <button v-if="loading" disabled 
                       class="btn btn-neutral my-4">
                       <span class="spinner-border spinner-border-sm" 
                       role="status" aria-hidden="true"></span>
@@ -93,12 +103,9 @@
                    @click="editAccount(account.id)" 
                   class="btn btn-default mb-sm-0 float-right">Toggle Internet Banking</button>
 
-                  <button 
-                      v-if="selected === account.id" disabled 
-                      class="btn btn-neutral mb-sm-0 float-right">
-                      <span class="spinner-border spinner-border-sm" 
-                      role="status" aria-hidden="true"></span>
-                  </button>
+                    <span v-if="selected === account.id" disabled  
+                    class="spinner-border spinner-border-sm float-right" 
+                    role="status" aria-hidden="true"></span>
                   <p>                      
                     <strong>{{account.account_name}}</strong><br/>
                     <strong>{{account.account_number}}</strong><br/>
@@ -107,7 +114,7 @@
                   </p>
                 </div>
 
-                <div v-if="!bvn.verified" class="text mb-10">
+                <div v-if="!verified" class="text mb-10">
                   <p><strong>You need to verify your identity.</strong> 
                     Visit the <strong>"Verify Identity"</strong> page and follow the instructions. </p>
 
@@ -144,51 +151,44 @@ export default {
       internetBanking: true,
       isValid: false,
       loading: false,
+      accounts: [],
       errors: {
         accountNumber: '',
         internetBanking: '',
       },
-      bvn: {
-        verified: false,
-      },
-      accounts: {},
       selected: 0,
-      user: {
-        notifications: {},
-      }
     };
   },
   methods: {
     ...mapActions([
-      'getProfile', 'addAccount',
+      'getProfile', 'addAccount', 'logOut',
       'getAccounts', 'updateAccount'
     ]),
     accountValidate() {
       this.$store.commit('clearMessages');
       const { error, isValid } = 
-      validateNumber(this.accountNumber, 'account number', 10);
+      validateNumber(this.accountNumber, 'account number');
       this.errors.accountNumber = error;
       this.isValid = isValid;
-     console.log('ddddd', this.accountNumber);
     },
     ibValidate() {
       this.$store.commit('clearMessages');
       if(!this.internetBanking){
-        this.errors.internetBanking = 'This is required for transactions notification';
+        this.errors.internetBanking = 
+        'This is required for transactions notification';
       } else {
         this.errors.internetBanking = '';
       }      
-     console.log('ddddd', this.internetBanking);
     },
     editAccount(id) {
       this.selected = id;
       this.updateAccount(id)
-      .then(() => this.getAccounts()
-        .then((res) => {
-          this.selected = 0;
-          this.accounts = res.data.accounts;
-          })
-        ).catch(() => this.selected = 0);
+      .then(() => this.getProfile()
+        .then(() => {
+          this.initialState();
+          this.accounts = this.getUser.bankAccounts;
+        }))
+        .catch(() => this.selected = 0);
 
     },
     initialState(){
@@ -196,6 +196,7 @@ export default {
       this.internetBanking = true;
       this.loading = false;
       this.isValid = false;
+      this.selected = 0;
       this.errors = {
         accountNumber: '',
         internetBanking: ''
@@ -219,9 +220,11 @@ export default {
         this.loading = false;    
         this.addAccount(body)
         .then(() => {
-          this.initialState();
-          this.getAccounts()
-          .then((res) => this.accounts = res.data.accounts);
+          this.getProfile()
+          .then(() => {
+            this.initialState();
+            this.accounts = this.getUser.bankAccounts;
+          })
         }).catch(() => this.initialState());
       }
 
@@ -229,25 +232,23 @@ export default {
   },
   computed: {
     ...mapGetters(['getError', 'getMessage', 'getUser']),
+    verified(){
+      return this.getUser.bvn && this.getUser.bvn.verified;
+    },
   },
   mounted(){
-    if(this.user.notifications.auto_logout){
+    if(this.getUser.notifications && 
+    this.getUser.notifications.auto_logout){
       window.onbeforeunload = (e) => {
         this.logOut();
       }
     }
+    
   },
   created(){
-    this.getProfile().then((res) => {
-      this.accounts = res.data.user.bankAccounts ? 
-      res.data.user.bankAccounts : {};
-      this.bvn = res.data.user.bvn ? 
-      res.data.user.bvn : {};
-
-      this.user = this.getUser;
-    });
-    
-    
+    this.$store.commit('clearMessages');
+    this.getProfile()
+    .then(() => this.accounts = this.getUser.bankAccounts || []);
   }
     
 };

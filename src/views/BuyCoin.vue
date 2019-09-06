@@ -27,11 +27,11 @@
                   <div class="btn-group d-flex" role="group">
                     <button @click="changeTrans('buy')" 
                     :class="trans === 'buy'? 'btn-basic': 'btn-default'" 
-                    class="btn w-100">Buy Trade Ad
+                    class="btn w-100">Buy Coin
                     </button>
                     <button @click="changeTrans('sell')" 
                     :class="trans === 'sell'? 'btn-basic': 'btn-default'" 
-                    class="btn w-100">Sell Trade Ad
+                    class="btn w-100">Sell Coin 
                     </button>
                   </div>
 
@@ -99,125 +99,58 @@
                   <div v-if="getMessage" class="alert alert-success" 
                   role="alert">{{ getMessage }}</div>
 
-                  <div class="text-left">
-                    <span :style="{ fontWeight: 'bold' }">Price per {{coin}}</span>
-                    <span class="float-right">
-                      <div class="custom-contol mb-3">
 
-                      <select class="custom-select custom-select-sm"
-                      v-model="priceType" name="priceType" @click="setPrice()"
-                      aria-describedby="addon-right addon-left">
-                      <option value="static">Static</option>
-                      <option value="dynamic">Dynamic</option>
-                      </select> 
-                      </div>
-                    </span>
-                  </div> <br>
+                  <p class="text-left" :style="{ fontWeight: 'bold' }">Amount</p>
 
-                    <div v-if="errors.price" 
+                    <div v-if="errors.amountInCash || errors.amountInCoin" 
                     class="alert alert-danger" 
-                    role="alert">{{ errors.price}}
+                    role="alert">{{ errors.amountInCash || errors.amountInCoin }}</div>
+
+                    <div class="input-group mb-3">
+                      <input 
+                        v-model="amountInCoin"
+                        class="form-control"
+                        type="text"
+                        :placeholder=amountInCash
+                        name="amountInCoin"
+                        aria-describedby="addon-right addon-left"
+                        @keyup="coinValidate()"/> 
+                        
+                        <div class="input-group-append">
+                          <span class="input-group-text" id="basic-addon2">
+                            {{coin}}
+                          </span>
+                        </div>
+                      </div> 
+
+
+                    <div class="input-group mb-3">
+                      <input 
+                        v-model="amountInCash"
+                        class="form-control"
+                        type="text"
+                        disabled
+                        :placeholder=amountInCoin
+                        name="amountInCash"
+                        aria-describedby="addon-right addon-left"
+                        /> 
+                        
+                        <div class="input-group-append">
+                          <span class="input-group-text" id="basic-addon2">
+                            NGN
+                          </span>
+                        </div>
+                      </div> 
+
+                      <div class="text-left">
+                        <span>Price per Coin</span>
+                        <span class="float-right" :style="{ fontWeight: 'bold' }">
+                          {{rate[coin][trans]}}/{{coin}}
+                        </span>
                     </div>
-
-                  <div class="input-group mb-3">
-                      <input 
-                        v-model="price"
-                        :disabled="priceType === 'dynamic'"
-                        class="form-control"
-                        type="text"
-                        :placeholder=pricePlaceholder
-                        name="price"
-                        aria-describedby="addon-right addon-left"
-                        @keyup="priceValidate()"/> 
-                        
-                        <div class="input-group-append">
-                          <span class="input-group-text" id="basic-addon2">
-                          NGN                           
-                          </span>
-                        </div>
-                      </div>
-
-                        <p v-if="price" class="text-left">
-                          {{trans === 'buy'? 'Seller Price': 'Buyer Price'}}
-                          <span class="float-right"><b>{{price}} NGN</b></span>
-                        </p>
-                  <hr/>
-
-
-                  <p class="text-left" :style="{ fontWeight: 'bold' }">Min {{coin}}</p>
-
-                    <div v-if="errors.minCoin" 
-                    class="alert alert-danger" 
-                    role="alert">{{ errors.minCoin }}</div>
-
-                    <div class="input-group mb-3">
-                      <input 
-                        v-model="minCoin"
-                        class="form-control"
-                        type="text"
-                        placeholder="Enter the minimun coin"
-                        name="minCoin"
-                        aria-describedby="addon-right addon-left"
-                        @keyup="minValidate()"/> 
-                        
-                        <div class="input-group-append">
-                          <span class="input-group-text" id="basic-addon2">
-                            {{coin}}
-                          </span>
-                        </div>
-                      </div>                  
-
                           
-                  <p class="text-left" :style="{ fontWeight: 'bold' }">Max {{coin}}</p>
-
-                    <div v-if="errors.maxCoin" 
-                    class="alert alert-danger" 
-                    role="alert">{{ errors.maxCoin }}</div>
-
-                    <div class="input-group mb-3">
-                      <input 
-                        v-model="maxCoin"
-                        class="form-control"
-                        type="text"
-                        placeholder="Enter the maximiun coin"
-                        name="maxCoin"
-                        aria-describedby="addon-right addon-left"
-                        @keyup="maxValidate()"/> 
-                        
-                        <div class="input-group-append">
-                          <span class="input-group-text" id="basic-addon2">
-                            {{coin}}
-                          </span>
-                        </div>
-                      </div>
-
                       <hr/>
 
-
-                  <p class="text-left" :style="{ fontWeight: 'bold' }">Deadline</p>
-
-                    <div v-if="errors.deadline" 
-                    class="alert alert-danger" 
-                    role="alert">{{ errors.deadline }}</div>
-
-                    <div class="input-group mb-3">
-                      <input 
-                        v-model="deadline"
-                        class="form-control"
-                        type="text"
-                        placeholder="Enter the deadline"
-                        name="deadline"
-                        aria-describedby="addon-right addon-left"
-                        @keyup="deadlineValidate()"/> 
-                        
-                        <div class="input-group-append">
-                          <span class="input-group-text" id="basic-addon2">
-                            Days
-                          </span>
-                        </div>
-                      </div>
-                    
-                    <hr/>
 
                   <p class="text-left" :style="{ fontWeight: 'bold' }">
                     {{trans === 'buy'? 'Debit Card Number': 'Account Number'}}</p>
@@ -290,9 +223,23 @@ const ethSelling = process.env.VUE_APP_ETH_SELLING_PRICE;
 const ethBuying = process.env.VUE_APP_ETH_BUYING_PRICE;
 
 export default {
-  name: "PostTrade",
+  name: "BuyCoin",
   data() {
     return {
+      amountInCash: '',
+      amountInCoin: '',
+      card: '',
+      account: '',
+      trans: 'buy',
+      coin: 'BTC',
+      isValid: false,
+      errors: {
+        amountInCash: '',
+        amountInCoin: '',
+        account: '',
+        card: '',
+      },
+      loading: false,
       rate: {
         BTC: {
           buy: btcBuying,
@@ -307,25 +254,6 @@ export default {
           sell: ethSelling
         }
       },
-      priceType: 'static',
-      price: '',
-      minCoin: '',
-      maxCoin: '',
-      card: '',
-      deadline: '',
-      account: '',
-      trans: 'buy',
-      coin: 'BTC',
-      isValid: false,
-      errors: {
-        price: '',
-        minCoin: '',
-        maxCoin: '',
-        deadline: '',
-        account: '',
-        card: '',
-      },
-      loading: false,
     };
   },
   methods: {
@@ -333,33 +261,17 @@ export default {
       'getProfile', 'logOut', 'getWallet', 
       'postBuyTrade', 'postSellTrade'
     ]),
-    priceValidate() {
+    coinValidate() {
       this.$store.commit('clearMessages');
       const { error, isValid } = 
-      validateAmount(this.price, 'price');      
-      this.errors.price = error;
+      validateAmount(this.amountInCoin, 'amount in coin');      
+      this.errors.amountInCoin = error;
       this.isValid = isValid;
-    },
-    minValidate() {
-      this.$store.commit('clearMessages');
-      const { error, isValid } = 
-      validateAmount(this.minCoin, 'minimum coin');      
-      this.errors.minCoin = error;
-      this.isValid = isValid;
-    },
-    maxValidate() {
-      this.$store.commit('clearMessages');
-      const { error, isValid } = 
-      validateAmount(this.maxCoin, 'maximum coin');      
-      this.errors.maxCoin = error;
-      this.isValid = isValid;
-    },
-    deadlineValidate() {
-      this.$store.commit('clearMessages');
-      const { error, isValid } = 
-      validateNumber(this.deadline, 'deadline');      
-      this.errors.deadline = error;
-      this.isValid = isValid;
+
+      if(!error){
+        this.amountInCash = this.amountInCoin * this.rate[this.coin][this.trans];
+      }
+
     },
     cardValidate() {
       this.$store.commit('clearMessages');
@@ -376,19 +288,14 @@ export default {
       this.isValid = isValid;
     },
     setState(){
-      this.priceType = 'static',
-      this.price = '';
-      this.minCoin = '';
-      this.maxCoin = '';
-      this.deadline = '';
+      this.amountInCash = '';
+      this.amountInCoin = '';
       this.account = '';
       this.card = '';
       this.isValid = false;
       this.errors = {
-        price: '',
-        minCoin: '',
-        maxCoin: '',
-        deadline: '',
+        amountInCash: '',
+        amountInCoin: '',
         account: '',
         card: '',
       };
@@ -398,22 +305,7 @@ export default {
       let status = true;
 
       if(status){
-        this.priceValidate();
-        status = this.isValid;
-      }
-
-      if(status){
-        this.minValidate();
-        status = this.isValid;
-      }
-
-      if(status){
-        this.maxValidate();
-        status = this.isValid;
-      }
-
-      if(status){
-        this.deadlineValidate();
+        this.coinValidate();
         status = this.isValid;
       }
 
@@ -429,11 +321,11 @@ export default {
 
       const body = {
         coin: this.coin,
-        price_type: this.priceType,
-        price: this.price,
-        min: this.minCoin,
-        max: this.maxCoin,
-        deadline: (this.deadline * 24 * 60),
+        price_type: 'dynamic',
+        price: this.rate[this.coin][this.trans],
+        min: this.amountInCoin,
+        max: this.amountInCoin,
+        deadline: (7 * 24 * 60),
         account_number: this.account,
         card: this.card,
       }  
@@ -457,22 +349,17 @@ export default {
       this.$store.commit('clearMessages');
       this.setState();
       this.coin = coin;
-      console.log('coin...', this.coin);
     },
     changeTrans(trans){
       this.$store.commit('clearMessages');
       this.setState();
       this.trans = null;
       this.trans = trans;
-
-      console.log('trans...', this.trans);
     },
     setPrice(){
       this.$store.commit('clearMessages');
-      this.price = '';
       if(this.priceType === 'dynamic'){
-        this.price = this.rate[this.coin][this.trans];
-        console.log('fgfgfgfg', this.price);
+        this.price = pricePerCoin;
       }
     },
   },
@@ -486,28 +373,17 @@ export default {
   },
   computed: {
     ...mapGetters(['getError', 'getUser', 'getMessage']),
-    pricePlaceholder(){
-      if(this.priceType === 'static'){
-        return `Enter your price per ${this.coin}`
-      }
-
-      if(this.priceType === 'dynamic'){
-        return this.price;
-      }
-    },
     verified(){
       return this.getUser.bvn && this.getUser.bvn.verified;
     },
     noErrors(){
       const { 
-        price, minCoin, 
-        maxCoin, deadline, 
+        amountInCash, amountInCoin, 
         card, account 
       } = this.errors;
       
-      
-      return price || minCoin || maxCoin ||
-      deadline || (card || account) || !this.isValid;
+      return amountInCash || amountInCoin ||
+       (card || account) || !this.isValid;
 
     }
   },

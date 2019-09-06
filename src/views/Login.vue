@@ -190,7 +190,7 @@ export default {
       if(status){
         this.loading = true;
         this.loginUser(body)
-        .then(() => this.loading = false);
+        .then(() => this.initialState());
       }
     },
   },

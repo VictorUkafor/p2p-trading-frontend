@@ -77,7 +77,6 @@ const actions = {
             await axios.get(`${api}/auth/find-token/${token}`);
             commit('setActToken', true);
             localStorage.setItem('activationToken', true);
-            console.log('codecccc', token);
         } catch(e){
             commit('setError', e.response.data.errorMessage || 
             e.response.data.errors.email[0] || 
@@ -108,23 +107,24 @@ const actions = {
     async loginUser({ commit }, body) {
         try{
             const res = await axios.post(`${api}/auth/login`, body);
-             localStorage.setItem('token', res.data.token);                
-                
-            if(!res.data.two_fa){
-                commit('setAuth', true); 
-                commit('setAuthToken', res.data.token);
-                localStorage.setItem('auth', true);  
-                router.go('/dashboard');
-            }
-
+             localStorage.setItem('token', res.data.token); 
+             
             if(res.data.two_fa === 'sms'){
                 router.push('/2fa-login/sms');
             }
-
+            
             if(res.data.two_fa === 'google'){
                 router.push('/2fa-login/google');
+            } 
+            
+            if(!res.data.two_fa && res.data.token){
+                commit('setAuth', true); 
+                commit('setAuthToken', res.data.token);
+                localStorage.setItem('auth', true);  
+                router.go('/dashboard'); 
             }
 
+            
         } catch(e){
             localStorage.removeItem('token');
             commit('setAuth', false);
@@ -135,7 +135,7 @@ const actions = {
     },
     async smsLogin({ commit }, body) {
         try{
-            const res = await axios.post(`${api}/auth/login-with-sms`, body);
+            await axios.post(`${api}/auth/login-with-sms`, body);
             const token = localStorage.getItem('token');
             commit('setAuth', true); 
             commit('setAuthToken', token);
@@ -152,7 +152,7 @@ const actions = {
     },
     async googleLogin({ commit }, body) {
         try{
-            const res = await axios.post(`${api}/auth/login-with-google`, body);
+            await axios.post(`${api}/auth/login-with-google`, body);
             commit('setAuth', true);            
         } catch(e){
             localStorage.removeItem('token');

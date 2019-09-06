@@ -5,7 +5,7 @@ const token = localStorage.getItem('token');
 const headers = { 
     headers: {
         'Authorization' : `Bearer ${token}`,
-        'content-Type' : 'application/json',
+        'Content-Type' : 'application/json',
     }
 }
 
@@ -29,11 +29,9 @@ const actions = {
             const res = await axios.get(`${api}/profile`, headers);
             commit('setUser', res.data.user);
             localStorage.setItem('user', res.data.user);
-            console.log('wwwww', res.data);
             return res;
         } catch(e){
             commit('setAuth', false);
-            console.log('wwwww', e.response.data);
         }
     },
     async updateProfile({ commit }, body) {
@@ -42,11 +40,9 @@ const actions = {
             commit('setUser', res.data.user);
             commit('setMessage', res.data.successMessage);
             localStorage.setItem('user', res.data.user);
-            console.log('wwwww', res.data);
         } catch(e){
             commit('setError', e.response.data.errorMessage || e.response.data.errors ||
             'Your request could not be process at this time, please try again later');
-            console.log('wwwww', e.response.data);
         }
     },
     async addBVN({ commit }, body) {
@@ -64,37 +60,31 @@ const actions = {
         try{
             const res = await axios.put(`${api}/bvn`, body, headers);
             commit('setMessage', res.data.successMessage);
-            console.log('wwwww', res.data);
             return res;
         } catch(e){
             commit('setError', e.response.data.errorMessage || 
             e.response.data.errors.bvn_number[0] ||
             'Your request could not be process at this time, please try again later');
-            console.log('wwwww', e.response.data);
         }
     },
     async sendOTP({ commit }) {
         try{
             const res = await axios.get(`${api}/bvn/send-otp`, headers);
             commit('setMessage', res.data.successMessage);
-            console.log('wwwww', res.data);
         } catch(e){
             commit('setError', e.response.data.errorMessage || 
             e.response.data.errors.bvn_number[0] ||
             'Your request could not be process at this time, please try again later');
-            console.log('wwwww', e.response.data);
         }
     },
     async verifyOTP({ commit }, body) {
         try{
             const res = await axios.post(`${api}/bvn/verify-otp`, body, headers);
             commit('setMessage', res.data.successMessage);
-            console.log('wwwww', res.data);
         } catch(e){
             commit('setError', e.response.data.errorMessage || 
             e.response.data.errors.bvn_number[0] ||
             'Your request could not be process at this time, please try again later');
-            console.log('wwwww', e.response.data);
         }
     },
 };

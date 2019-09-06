@@ -2,7 +2,18 @@
   <section class="section section-shaped section-lg my-0">
     <div class="shape shape-style-1 bg-gradient-default">
     </div>
-
+          
+    <div v-if="!getUser.id" class="shape-style-1"
+    :style="{ 
+      marginLeft: '40%',
+      marginTop: '5em',
+      marginBottom: '5em'}" >
+      <span 
+      class="spinner-border spinner-border-sm" 
+      role="status" 
+      aria-hidden="true">
+      </span>    
+    </div>
 
 
     <div v-if="getUser.id" class="container pt-lg-md">
@@ -11,7 +22,16 @@
           <div class="card bg-secondary shadow">
             <div class="card-body px-lg-5 py-lg-5">
 
-                <div class="text-center mb-10">
+                <div v-if="!verified" class="text mb-10">
+                  <p><strong>You need to verify your identity.</strong> 
+                    Visit the <strong>"Verify Identity"</strong> page and follow the instructions. </p>
+
+                    <router-link to="/verify-identity">
+                    <button class="btn btn-outline-default mb-sm-0">Verify Your Identity</button>
+                    </router-link>
+                </div>
+
+                <div v-if="verified" class="text-center mb-10">
                   <h5><strong>Security & Settings</strong></h5>
                   <hr/>
 
@@ -26,35 +46,31 @@
                     <span class="float-right">
                       <label class="custom-toggle">
                         <input type="checkbox"                       
-                        :checked="user.two_fa"
+                        :checked="getUser.two_fa"
                         @click="selectFa()"/>
                         <span class="custom-toggle-slider rounded-circle"></span>
                       </label> 
                       </span>
                       </p>
 
-                    <small v-if="!user.two_fa">Your account is not protected
+                    <small v-if="!getUser.two_fa">Your account is not protected
                        by two-factor authentication! Enable an authenticator by selecting
                         an option to get started.<br/> <br/></small>
                     
 
-                  <form 
-                  v-if="toggle && !otpSent" 
-                  role="form" 
-                  method="post"
-                  @submit.prevent="sendOTP">
-
+                  <form v-if="toggle && !otpSent" role="form"
+                  method="post" @submit.prevent="sendOTP">
 
                   <div v-if="!qrCode.qrCode && !loading" 
                   class="form-group input-group-alternative" 
                   @click="createQrCode">
-                      <select class="form-control"
+                      <select class="custom-select custom-select-bg"
                       v-model="faType"
                       name="faType"
                       aria-describedby="addon-right addon-left"
                       >
-                      <option>SMS</option>
-                      <option>Google Authenticator</option>
+                      <option value="SMS">SMS</option>
+                      <option value="Google Authenticator">Google Authenticator</option>
                       </select>                                        
                   </div>
 
@@ -84,13 +100,9 @@
                       class="btn btn-link my-4">Please the SMS option. 
                       This feature is still in development!</button>
 
-                    <button 
-                      v-if="loading" 
-                      disabled 
-                      class="btn btn-neutral my-4">
-                      <span class="spinner-border spinner-border-sm" 
-                      role="status" aria-hidden="true"></span>
-                      Loading . . .</button>
+                    <button v-if="loading" disabled class="btn btn-neutral my-4">
+                      <span class="spinner-border spinner-border-sm" role="status"
+                      aria-hidden="true"></span>Loading . . .</button>
 
                    </form>
 
@@ -170,7 +182,7 @@
                     <span class="float-right">
                       <label class="custom-toggle">
                         <input type="checkbox" 
-                        :checked="user.notifications.push_notification" 
+                        :checked="getUser.notifications && getUser.notifications.push_notification" 
                         @click="selectPush()"/>
                         <span class="custom-toggle-slider rounded-circle"></span>
                       </label> 
@@ -181,7 +193,7 @@
                     <span class="float-right">
                       <label class="custom-toggle">
                         <input type="checkbox" 
-                        :checked="user.notifications.email_notification" 
+                        :checked="getUser.notifications && getUser.notifications.email_notification" 
                         @click="selectEmail()"/>
                         <span class="custom-toggle-slider rounded-circle"></span>
                       </label> 
@@ -197,14 +209,14 @@
                     <span class="float-right">
                       <label class="custom-toggle">
                         <input type="checkbox" 
-                        :checked="user.notifications.auto_logout" 
+                        :checked="getUser.notifications && getUser.notifications.auto_logout" 
                         @click="selectAutologout()"/>
                         <span class="custom-toggle-slider rounded-circle"></span>
                       </label> 
                       </span></p>
                     <small>You currently have auto logout 
-                      <strong>{{user.notifications.auto_logout ? 'enabled' : 'disabled'}}</strong>.
-                     This means your account is{{user.notifications.auto_logout ? '' : ' not'}} automatically logged out when
+                      <strong>{{getUser.notifications && getUser.notifications.auto_logout ? 'enabled' : 'disabled'}}</strong>.
+                     This means your account is{{getUser.notifications && getUser.notifications.auto_logout ? '' : ' not'}} automatically logged out when
                       you close or dismiss this app.</small>
                   </div>
                   <hr/>
@@ -260,17 +272,13 @@ export default {
       otpSent: false,
       isValid: false,
       loading: false,
-      user: {
-        notifications: {
-        }
-      },
     };
   },
   methods: {
     ...mapActions([
       'getProfile', 'remove2Fa', 'sms2Fa', 'setSMS2fa',
       'emailNotification', 'pushNotification', 'autoLogout',
-      'google2Fa', 'setGoogle2fa'
+      'google2Fa', 'setGoogle2fa', 'logOut'
     ]),
     otpValidate() {
       this.$store.commit('clearMessages');
@@ -286,39 +294,34 @@ export default {
       this.faType = 'SMS'
       this.qrCode = { qrCode: false };
       
-
-      if(!this.fa && this.user.two_fa){ 
+      if(!this.fa && this.getUser.two_fa){ 
         this.remove2Fa()
-        .then(() => this.changeState()); 
+        .then(() => {
+          this.profile();
+          this.initialState();
+        }); 
       }
     },
     selectEmail(){
       this.emailNotification()
-      .then(() => {
-        this.user.notifications.email_notification = 
-        !this.user.notifications.email_notification
-      }); 
+      .then(() => this.profile()); 
     },
     selectPush(){
       this.pushNotification()
-      .then(() => {
-        this.user.notifications.push_notification = 
-        !this.user.notifications.push_notification
-      }); 
+      .then(() => this.profile()); 
     },
     selectAutologout(){
       this.autoLogout()
-      .then(() => {
-        this.user.notifications.auto_logout = 
-        !this.user.notifications.auto_logout
-      }); 
+      .then(() => this.profile()); 
     },
     sendOTP(){
       this.loading = true
 
       if(this.faType === 'SMS'){
         this.$store.commit('clearMessages');
-        this.sms2Fa().then((res) => {
+        this.sms2Fa()
+        .then((res) => {
+          this.profile();
           this.initialState();           
           this.otpSent = !res.data.set;
           this.loading = false;
@@ -337,6 +340,7 @@ export default {
       if(this.faType === 'Google Authenticator'){
         this.loading = true;
         this.google2Fa().then((res) => {
+          this.profile();
           this.initialState();  
           this.otpSent = res.data.set;  
           this.qrCode = res.data;       
@@ -360,6 +364,7 @@ export default {
       if(status && this.faType === 'SMS'){
         this.loading = true;
         this.setSMS2fa(body).then(() => {
+          this.profile()
           this.initialState(); 
           this.otpSent = false;
         }).catch((e) => {
@@ -372,6 +377,7 @@ export default {
       if(status && this.faType === 'Google Authenticator'){
         this.loading = true;
         this.setGoogle2fa(body).then(() => {
+          this.profile();
           this.initialState(); 
           this.otpSent = false;
         }).catch((e) => {
@@ -381,7 +387,6 @@ export default {
 
     },
     initialState(){
-      this.faType = 'SMS';
       this.otp = '';
       this.errors = {
         otp: '',
@@ -389,39 +394,46 @@ export default {
       this.isValid = false;
       this.loading = false;
     },
+    profile(){
+      this.getProfile().then(() => {
+      this.fa = this.getUser.two_fa;
+      
+      if(this.getUser.two_fa === 'sms'){
+        this.faType = 'SMS';
+      }
+
+      if(this.getUser.two_fa === 'google'){
+        this.faType = 'Google Authenticator';
+      }
+
+      if(this.getUser.sms2fa){
+        this.smsSetup = true; 
+      }
+
+      if(this.getUser.google2fa_secret){
+        this.googleSetup = true; 
+      }    
+    }); 
+    },
   },
   computed: {
     ...mapGetters(['getError', 'getMessage', 'getUser']),
+    verified(){
+      return this.getUser.bvn && this.getUser.bvn.verified;
+    },
   },
   mounted(){
-    if(this.user.notifications.auto_logout){
+    if(this.getUser.notifications && 
+    this.getUser.notifications.auto_logout){
       window.onbeforeunload = (e) => {
         this.logOut();
       }
     }  
   },
   created(){
-    this.getProfile().then(() => {
-    this.user = this.getUser;
-    this.fa = this.user.two_fa;
-
-    if(this.user.two_fa === 'sms'){
-      this.faType = 'SMS';
-    }
-
-    if(this.user.two_fa === 'google'){
-      this.faType = 'Google Authenticator';
-    }
-
-    if(this.user.sms2fa){
-      this.smsSetup = true; 
-    }
-
-    if(this.user.google2fa_secret){
-      this.googleSetup = true; 
-    }    
-  }); 
- }
+    this.$store.commit('clearMessages');
+    this.profile(); 
+  }
     
 };
 

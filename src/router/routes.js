@@ -18,6 +18,10 @@ import Wallet from '../views/Wallet';
 import SendCoin from '../views/SendCoin';
 import PostTrade from '../views/PostTrade';
 import FindTrade from '../views/FindTrade';
+import BuyCoin from '../views/BuyCoin';
+import Order from '../views/Order';
+import MyTrade from '../views/MyTrade';
+import TradeActivity from '../views/TradeActivity';
 
 
 export default [
@@ -252,6 +256,58 @@ export default [
     },
     meta: {
       title: 'Find Trade Ads | P2P Trading',
+      requiresAuth: true,
+    },
+  },
+  {
+    path: '/buy-and-sell-coin',
+    name: 'buy-coin',
+    components: {
+      header: AppHeader,
+      default: BuyCoin,
+      footer: AppFooter
+    },
+    meta: {
+      title: 'Buy and Sell Coin | P2P Trading',
+      requiresAuth: true,
+    },
+  },
+  {
+    path: '/my-orders',
+    name: 'my-orders',
+    components: {
+      header: AppHeader,
+      default: Order,
+      footer: AppFooter
+    },
+    meta: {
+      title: 'My Orders | P2P Trading',
+      requiresAuth: true,
+    },
+  },
+  {
+    path: '/my-trades',
+    name: 'my-trades',
+    components: {
+      header: AppHeader,
+      default: MyTrade,
+      footer: AppFooter
+    },
+    meta: {
+      title: 'My Trade Ads | P2P Trading',
+      requiresAuth: true,
+    },
+  },
+  {
+    path: '/my-trade-activity',
+    name: 'my-activity',
+    components: {
+      header: AppHeader,
+      default: TradeActivity,
+      footer: AppFooter
+    },
+    meta: {
+      title: 'My Trade Activity | P2P Trading',
       requiresAuth: true,
     },
   }

@@ -2,7 +2,18 @@
   <section class="section section-shaped section-lg my-0">
     <div class="shape shape-style-1 bg-gradient-default">
     </div>
-
+          
+    <div v-if="!getUser.id" class="shape-style-1"
+    :style="{ 
+      marginLeft: '40%',
+      marginTop: '5em',
+      marginBottom: '5em'}" >
+      <span 
+      class="spinner-border spinner-border-sm" 
+      role="status" 
+      aria-hidden="true">
+      </span>    
+    </div>
 
 
     <div v-if="getUser.id" class="container pt-lg-md">
@@ -186,7 +197,7 @@ export default {
   },
   methods: {
     ...mapActions([
-      'getProfile', 'updateProfile'
+      'getProfile', 'updateProfile', 'logOut'
     ]),
     firstNameValidate() {
       this.$store.commit('clearMessages');
@@ -267,13 +278,15 @@ export default {
     },
   },
   mounted(){
-    if(this.user.notifications.auto_logout){
+    if(this.getUser.notifications && 
+    this.getUser.notifications.auto_logout){
       window.onbeforeunload = (e) => {
         this.logOut();
       }
     }
   },
   created(){
+    this.$store.commit('clearMessages');
     this.getProfile().then(() => {
       this.user = this.getUser;
     });

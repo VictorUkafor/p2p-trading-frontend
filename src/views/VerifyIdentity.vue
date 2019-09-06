@@ -2,7 +2,18 @@
   <section class="section section-shaped section-lg my-0">
     <div class="shape shape-style-1 bg-gradient-default">
     </div>
-
+          
+    <div v-if="!getUser.id" class="shape-style-1"
+    :style="{ 
+      marginLeft: '40%',
+      marginTop: '5em',
+      marginBottom: '5em'}" >
+      <span 
+      class="spinner-border spinner-border-sm" 
+      role="status" 
+      aria-hidden="true">
+      </span>    
+    </div>
 
 
     <div v-if="getUser.id" class="container pt-lg-md">
@@ -11,9 +22,9 @@
           <div class="card bg-secondary shadow">
             <div class="card-body px-lg-5 py-lg-5">
 
-                <div v-if="!bvnNumber.verified" class="text-center mb-10">
+                <div v-if="!verified" class="text-center mb-10">
                   <h5><strong>Verify Identity</strong></h5>
-                  <div v-if="user.bvn && !bvnNumber.verified && !otpSent" 
+                  <div v-if="getUser.bvn && !verified && !otpSent" 
                   class="text-center text-muted mb-4">
                   <small>To change or edit your BVN number, just enter the new one
                     in the field below</small><br/>
@@ -41,7 +52,7 @@
                     class="alert alert-danger" 
                     role="alert">{{ error || getError }}</div>
 
-                  <div v-if="!bvnNumber.bvn_number && !user.bvn && !otpSent" 
+                  <div v-if="!getUser.bvn && !otpSent" 
                   class="form-group input-group-alternative">
                     <div class="input-group-prepend">
                       <span class="input-group-text">
@@ -62,7 +73,7 @@
                                         
                   </div>
                                 
-                  <div v-if="user.bvn && !bvnNumber.verified  && !otpSent" 
+                  <div v-if="getUser.bvn && !verified && !otpSent" 
                   class="form-group input-group-alternative">
                     <div class="input-group-prepend">
                       <span class="input-group-text">
@@ -83,7 +94,7 @@
                                         
                   </div>
 
-                  <div v-if="!bvn && user.bvn && !bvnNumber.verified  && !otpSent"
+                  <div v-if="!bvn && getUser.bvn && !verified && !otpSent"
                    class="form-group input-group-alternative">
                     <div class="input-group-prepend">
                       <span class="input-group-text">
@@ -131,17 +142,17 @@
                       Loading . . .</button>
 
                       <button 
-                      v-if="!loading && user.bvn && !bvnNumber.verified && !otpSent" 
+                      v-if="!loading && getUser.bvn && !verified && !otpSent" 
                       :disabled="noErrors" 
                       class="btn btn-default my-4">Edit BVN</button>
 
                     <button 
-                      v-if="!loading && !user.bvn && !otpSent" 
+                      v-if="!loading && !getUser.bvn && !otpSent" 
                       :disabled="noErrors" 
                       class="btn btn-default my-4">Add BVN</button>                      
                       
                     <button 
-                      v-if="!loading && user.bvn && !bvnNumber.verified && !bvn && !otpSent" 
+                      v-if="!loading && getUser.bvn && !verified && !bvn && !otpSent" 
                       class="btn btn-default my-4">Send OTP</button>
 
                     <button 
@@ -154,11 +165,11 @@
 
                 </div>
 
-                <div v-if="bvnNumber.verified" class="text-center mb-10">
+                <div v-if="verified" class="text-center mb-10">
                   <h5><strong>Identity Verified</strong></h5>
                   <div class="text-center text-muted mb-4">
                   <small>Your Bank Verification Number has 
-                    been verified successfully at {{ user.bvn.updated_at }}</small>
+                    been verified successfully at {{ getUser.bvn.updated_at }}</small>
                   </div>
                   <hr/>
 
@@ -190,27 +201,20 @@ export default {
       error:'',
       isValid: false,
       loading: false,
-      bvnNumber: {
-        verified: false,
-        bvn_number: '',
-      },
       otpSent: false,
       otp: '',
-      user: {
-        notifications: {}
-      }
     };
   },
   methods: {
     ...mapActions([
-      'addBVN', 'editBVN', 'sendOTP', 'getProfile', 'verifyOTP'
+      'addBVN', 'editBVN', 'sendOTP', 
+      'getProfile', 'verifyOTP', 'logOut'
     ]),
     bvnValidate() {
       this.$store.commit('clearMessages');
       const { error, isValid } = validateNumber(this.bvn, 'BVN');
       this.error = error;
       this.isValid = isValid;
-     console.log('ddddd', this.bvn);
 
     },
     otpValidate() {
@@ -229,14 +233,16 @@ export default {
       this.loading = true;
 
       if(!this.getUser.bvn && !this.otpSent){
-        this.processAdd();
+        this.processAdd()
       }
 
-      if(this.bvn && this.getUser.bvn && !this.bvnNumber.verified && !this.otpSent){
+      if(this.bvn && this.getUser.bvn && 
+      !this.verified && !this.otpSent){
         this.processEdit();
       }
 
-      if(!this.bvn && this.getUser.bvn && !this.bvnNumber.verified && !this.otpSent){
+      if(!this.bvn && this.getUser.bvn && 
+      !this.verified && !this.otpSent){
         this.processSend();
       }
 
@@ -253,15 +259,14 @@ export default {
         status = this.isValid;
       }
 
-
       const body = {
         bvn_number: this.bvn.trim(),
       }
 
       this.addBVN(body)
       .then((res) => {
-        this.initialState();
-        this.bvnNumber = res.data.bvn;
+        this.getProfile()
+        .then(() => this.initialState());
         }).catch(() => this.initialState());
 
     },
@@ -281,20 +286,21 @@ export default {
         bvn_number: this.bvn.trim(),
       }
 
-      console.log('ddddd122', this.bvn, body);
 
       this.editBVN(body)
       .then((res) => {
-        this.initialState();
-        this.bvnNumber = res.data.bvn;
-        }).catch(() => this.initialState());
+        this.getProfile()
+        .then(() => this.initialState());
+      }).catch(() => this.initialState());
 
     },
     processSend() {
       this.sendOTP().then(() => { 
-        this.otpSent = true;
-        this.loading = false;
+        this.getProfile().then(() => {
+          this.otpSent = true;
+          this.loading = false;          
         });
+      });
     },
     processOTP() {
       let status = true;
@@ -312,18 +318,19 @@ export default {
         otp: this.otp.trim(),
       }
 
-      console.log('ddddd122', this.bvn, body);
-
       this.verifyOTP(body)
-      .then(() => {
-        this.initialState();
-        this.bvnNumber.verified = true;
-        }).catch(() => this.initialState());
+      .then((res) => {
+        this.getProfile()
+        .then(() => this.initialState());
+      }).catch(() => this.initialState());
 
     },
   },
   computed: {
     ...mapGetters(['getError', 'getMessage', 'getUser']),
+    verified(){
+      return this.getUser.bvn && this.getUser.bvn.verified;
+    },
     formatPhone(){
       return `XXXXXXX${this.getUser.phone.substr(-4, 4)}`;
     },
@@ -332,7 +339,8 @@ export default {
     },
   },
   mounted(){
-    if(this.user.notifications.auto_logout){
+    if(this.getUser.notifications &&
+    this.getUser.notifications.auto_logout){
       window.onbeforeunload = (e) => {
         this.logOut();
       }
@@ -340,14 +348,7 @@ export default {
   },
   created(){
     this.$store.commit('clearMessages');
-    this.getProfile().then((res) => {
-      this.user = this.getUser;
-      this.bvnNumber = res.data.user.bvn ? res.data.user.bvn : {
-      verified: false,
-      bvn_number: '',
-      };  
-    });
-    
+    this.getProfile();
   }
     
 };
